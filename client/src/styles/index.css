@@ -1,10 +1,7 @@
 @font-face {
-  /* font-family: 'AmazonEmberMedium';
-  src: local('AmazonEmberMedium'), url('../fonts/Amazon-Ember-Medium.ttf') format('woff2'); */
   font-family: 'AmazonEmberRegular';
   src: local('AmazonEmberRegular'), url('../fonts/AmazonEmber_Rg.ttf') format('woff2');
 }
-
 
 body {
   margin: 0;
@@ -18,4 +15,24 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+/*  ============ DealList.js AgGridReact Styles ============  */
+
+.header-style {
+  font-weight: bold;
+  font-size: 1rem;
+  font-family: AmazonEmberRegular;
+  border-Bottom: solid 1px;
+}
+
+.name-column {
+  color: #0099cc;
+  border: none !important;
+  cursor: pointer;
+}
+
+.name-column:hover {
+  color: #e06d33;
+  text-decoration: underline;
 }

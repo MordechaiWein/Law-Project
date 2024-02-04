@@ -49,3 +49,8 @@ group :test do
 end
 
 gem "active_model_serializers", "~> 0.10.12"
+
+# All gems below have been added, and were not included by default.
+gem "jwt", "~> 2.7"
+
+gem "figaro", "~> 1.2"

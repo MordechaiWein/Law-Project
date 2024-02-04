@@ -13,12 +13,17 @@ const styles = {
         flexDirection: 'column'
     },
 
+    logo: {
+        marginBottom: '2rem',
+        fontWeight: 'bold'
+    },
+
     box: {
         backgroundColor: 'white', 
         border: 'solid 1px #ccc', 
         padding: '25px', 
         width: '300px', 
-        borderRadius: '8px', 
+        borderRadius: '8px'
     },
 
     signIn: {
@@ -29,19 +34,30 @@ const styles = {
     name: {
         fontFamily: "AmazonEmberRegular", 
         fontWeight: 'bold', 
-        fontSize: ''
+        fontSize: '',
+        marginLeft: '0.1rem'
     },
     
     textField: {
         height: '38px', 
-        fontSize: '0.95rem'
+        fontSize: '0.85rem',
+        fontFamily: "AmazonEmberRegular"
+    },
+    
+    error: {
+        fontSize: '0.95rem',
+        marginLeft: '0.1rem',
+        color: '#c62828',
+        paddingTop: '0.7rem',
+        fontFamily: "AmazonEmberRegular" 
     },
 
     password: {
         fontFamily: "AmazonEmberRegular", 
         marginTop: '20px', 
         fontWeight: 'bold', 
-        fontSize: ''
+        fontSize: '',
+        marginLeft: '0.1rem'
     },
 
     button: {
@@ -62,7 +78,8 @@ const styles = {
     administrator: {
         textDecoration: 'none',
         color: '#00559A',
+        '&:hover': { color: '#e06d33', textDecoration: 'underline' }
     }
-
+    
 }
 export default styles
