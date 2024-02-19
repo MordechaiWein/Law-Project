@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import './styles/index.css';
 import App from "./components/App";
 import { BrowserRouter as Router } from 'react-router-dom';
-import { MyProvider } from "./components/AppContext"
+import { MyProvider } from "./components/AppContext";
 
 
 ReactDOM.render(

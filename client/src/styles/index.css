@@ -36,3 +36,23 @@ code {
   color: #e06d33;
   text-decoration: underline;
 }
+
+.columns {
+  border-left: solid 1px #ccc !important;
+}
+
+.columns:focus {
+  border-left: solid 1px #2196f3 !important;
+}
+
+.red-cell {
+  color: #ef5350;
+}
+
+.green-cell {
+  color: #4caf50;
+}
+
+.blue-cell {
+  color: #0288d1;
+}

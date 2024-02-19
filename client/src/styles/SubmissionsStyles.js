@@ -82,7 +82,7 @@ const styles = {
         fontSize: {xs: '3rem', sm: '3rem', md: '3rem', lg: '4rem'},
         fontWeight: 'bold',
         fontFamily: "AmazonEmberRegular",
-        marginBottom: '1.5rem',   
+        marginBottom: '1rem'   
     },
 
     cCoName: {

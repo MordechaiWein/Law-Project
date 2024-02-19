@@ -16,7 +16,7 @@ const styles = {
         alignItems: 'center', 
         justifyContent: 'space-around',
         padding: '20px',
-        boxShadow: '0 10px 15px rgba(0, 23, 81, 0.2)',
+        boxShadow: '0 10px 15px rgba(0, 23, 81, 0.2)'
     },
 
     Oops: {

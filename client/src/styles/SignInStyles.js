@@ -66,7 +66,8 @@ const styles = {
         mb: 1, 
         boxShadow: 'none', 
         color: 'black', 
-        borderRadius: '8px'
+        borderRadius: '8px',
+        textTransform: 'none'
     },
 
     rules: {

@@ -10,7 +10,7 @@ import Divider from '@mui/material/Divider'
 import Link from '@mui/material/Link'
 import { createTheme, ThemeProvider } from '@mui/material/styles'
 
-const defaultTheme = createTheme({ palette: { primary: { main: '#000000' }, secondary: { main: '#00559A' } } })
+const defaultTheme = createTheme({ palette: { primary: { main: '#00559A' } } })
 
 function SignIn() {
 
@@ -20,7 +20,7 @@ function SignIn() {
 
     function handleChange(event) {
         setError('')
-        setData({...data, [event.target.name] : event.target.value})
+        setData({...data, [event.target.name]: event.target.value})
     }
 
     function handleSubmit(e) {
@@ -76,7 +76,7 @@ function SignIn() {
 
                         <Typography sx={styles.error}>{error}</Typography>
 
-                        <Button type="submit" disableRipple fullWidth sx={styles.button} variant="contained" color="secondary">Sign in</Button>
+                        <Button disableRipple fullWidth sx={styles.button} variant="contained" type="submit">Sign in</Button>
                     
                         <Typography sx={styles.rules}>
                            Sign-in only. For registration inquiries, contact 

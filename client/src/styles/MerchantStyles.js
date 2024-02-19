@@ -40,11 +40,11 @@ const styles = {
         width: '50%', 
         marginLeft: '0.8rem'
     },
-
+    
     // ============= MerchantInfoItem.js ============= //
 
     item: {
-        height: { xs: '100px', sm: '75px', md: '75px', lg: '100px'},
+        height: { xs: '100px', sm: '75px', md: '75px', lg: '100px'}
     },
 
     key: {
@@ -60,7 +60,7 @@ const styles = {
         fontFamily: 'AmazonEmberRegular',
         fontSize: '0.8rem',
         height: '40px', 
-        borderRadius: 0   
+        borderRadius: 0  
     },
 
     // ============= MerchantOperations.js ============= //
@@ -74,7 +74,7 @@ const styles = {
     },
 
     opContainer: {
-        display: 'flex',
+        display: 'flex'
     },
 
     boxOne: {

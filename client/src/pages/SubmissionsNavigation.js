@@ -18,13 +18,8 @@ function SubmissionsNavigation({ isMobile }) {
     const history = useHistory()
   
     function handleClick() {
-        fetch('/logout', {
-            method: 'DELETE'
-        })
-        .then(() => {
-            setUser(null)
-            history.push('/')
-        })
+        fetch('/logout', { method: 'DELETE' } )
+        .then(() => { setUser(null); history.push('/') })
     }
     
     return (

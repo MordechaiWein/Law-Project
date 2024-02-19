@@ -7,6 +7,7 @@ function MyProvider({children}) {
     const [user, setUser] = useState(null)
     const [isLoading, setIsLoading] = useState(true)
     const [signUpFormVisible, setSignUpFormVisible] = useState(false)
+    const [merchants, setMerchants] = useState([])
 
     useEffect(() => {
         setIsLoading(true)
@@ -21,10 +22,36 @@ function MyProvider({children}) {
         })
     },[])
 
+    useEffect(() => {
+        fetch('/merchants')
+        .then(response => response.json())
+        .then(data => setMerchants(data))
+    }, [])
+    
+    function editMerchant(data) {
+        const updateMerchants = merchants.map(merchant => {
+            if (merchant.id === data.id) {
+                return data
+            } else {
+                return merchant
+            }
+        })
+        setMerchants(updateMerchants)
+    }
+
     return (
 
         <AppContext.Provider 
-            value={{setUser, user, isLoading, signUpFormVisible, setSignUpFormVisible}}
+            value={{
+                setUser, 
+                user, 
+                isLoading, 
+                signUpFormVisible, 
+                setSignUpFormVisible,
+                merchants,
+                setMerchants,
+                editMerchant
+            }}
         >
             {children}
         </AppContext.Provider>

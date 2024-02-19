@@ -1,4 +1,5 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useContext } from 'react'
+import { AppContext } from "./AppContext"
 import Container from '@mui/material/Container'
 import { useHistory } from 'react-router-dom';
 import { AgGridReact } from 'ag-grid-react'
@@ -8,52 +9,126 @@ import "ag-grid-community/styles/ag-theme-quartz.css"
 function DealList() {
 
     const history = useHistory()
-    const rowStyle = {fontFamily: 'AmazonEmberRegular'}
+    const {merchants, editMerchant} = useContext(AppContext)
 
-    const rowData = [ {id: 1,name: 'Melinda Marie Brands', funder: 'Velocity Capital Group LLC',balance: '$1,000,000',defaultfee: '$1,000,000',NSFfee: '$40,000',uccfee: '$50,000',total: '$45,000',legal: 'Nathen Wein Law',subtotal: '$30,000',phone: '1-917-745-6409',phone2: '1-516-526-2096',email: 'mordwein77@gmail.com'}]
+    const dateRegex = /^\d{2}\/\d{2}\/\d{2}$/
 
-    const columnDefs = [
-        { headerName: 'Name', field: 'name', editable: false, cellClass: 'name-column'},
-        { headerName: 'Funder', field: 'funder'},
-        { headerName: 'Balance', field: 'balance'},
-        { headerName: 'Default Fee', field: 'defaultfee'},
-        { headerName: 'NSF Fee', field: 'NSFfee'},
-        { headerName: 'UCC Fee', field: 'uccfee'},
-        { headerName: 'Total', field: 'total'},
-        { headerName: 'Legal', field: 'legal'},
-        { headerName: 'Subtotal', field: 'subtotal'},
-        { headerName: 'Phone', field: 'phone'},
-        { headerName: 'Phone 2', field: 'phone2'},
-        { headerName: 'Email', field: 'email'}
+    function cellClickedListener(event) {
+        if (event.colDef.field === 'merchants_legal_name_title_case') { 
+            const modifiedName = event.data.merchants_legal_name_title_case.replace(/ /g, '-')
+            history.push(`deal-list/${modifiedName}`)
+        } 
+    }
+
+    function agGridCellSubmit(editData) {
+        fetch(`/merchants/${editData.id}`, {
+            method: 'PATCH',
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(editData)
+        })
+        .then(response => response.json())
+        .then(data => editMerchant(data))
+    }
+
+    function CellValueChanged(event) {
+        if (event.colDef.field === "date_served") {
+            if (event.data.date_served && event.data.date_served.match(dateRegex)) {
+                const servedDate = new Date(event.data.date_served)
+                servedDate.setDate(servedDate.getDate() + 35)
+                const defaultJudgmentDate = servedDate.toLocaleDateString('en-US', {month: '2-digit', day: '2-digit', year: '2-digit'})
+                const editData = {id: event.data.id, date_served: event.data.date_served, default_judgment: defaultJudgmentDate}
+                agGridCellSubmit(editData)
+            } else {
+                const value = event.colDef.field
+                const editData = {id: event.data.id, [event.colDef.field]: event.data[value]}
+                agGridCellSubmit(editData)
+            }
+        } else {
+            const value = event.colDef.field
+            const editData = {id: event.data.id, [event.colDef.field]: event.data[value]}
+            agGridCellSubmit(editData)
+        }
+    }
+
+    function isPastDefaultJudgment(defaultJudgmentDate) {
+        const today = new Date()
+        const judgmentDate = new Date(defaultJudgmentDate)
+        return today >= judgmentDate
+    }
+
+    const columnDefs = [   
+        { headerName: 'Name', field: 'merchants_legal_name_title_case', editable: false, cellClass: 'name-column'},
+        { headerName: 'Date Submitted', field: 'created' },
+        { headerName: 'RTR', field: 'balance'},
+        { headerName: 'RTR + LEGAL', field: 'rtr_legal'}, 
+        { headerName: 'FULL', field: 'total'},
+        { 
+            headerName: 'Suit Status', 
+            field: 'suit_status',
+            cellClassRules: {
+                'red-cell': (params) => params.value === 'Not yet filed',
+                'green-cell': (params) => params.value === 'Filled'
+            }
+        },
+        { 
+            headerName: 'AOS', 
+            field: 'aos',
+            cellClassRules: {
+                'red-cell': (params) => params.value === 'Not yet filed',
+                'green-cell': (params) => params.value === 'Filled'
+            }
+            
+        },
+        { 
+            headerName: 'Date Served', 
+            field: 'date_served',
+            cellClassRules: {
+                'red-cell': (params) => params.value === 'Not yet served',
+                'green-cell': (params) => params.value && params.value.match(dateRegex)
+            }
+        },
+        { 
+            headerName: 'Default Judgment', 
+            field: 'default_judgment',
+            editable: false,
+            cellClassRules: {
+                'green-cell': (params) => isPastDefaultJudgment(params.value)
+            }
+        },
+        { 
+            headerName: 'UCC Satuts', 
+            field: 'ucc_status',
+            cellClassRules: {
+                'red-cell': (params) => params.value === 'Not yet started',
+                'green-cell': (params) => params.value === 'Complete',
+                'blue-cell': (params) => params.value === 'In process',
+            }
+        },   
+        { headerName: 'Law Firm', field: 'law_firm'},
+        { headerName: 'Notes', field: 'notes'} 
     ]
-
+    
     const defaultColDef = useMemo(() => ({
         sortable: true,
         filter: true,
         editable: true,
-        width: 290,
+        width: 286.5,
+        cellClass: 'columns',
         headerClass: 'header-style'
     }), [])
-
-    function cellClickedListener(event) {
-        if (event.colDef.field === 'name') { 
-            const modifiedName = event.data.name.replace(/ /g, '-')
-            history.push(`deal-list/${modifiedName}`)
-        }
-    }
 
     return (
 
         <Container disableGutters maxWidth={false} className='ag-theme-quartz' style={{width: '100%', height: '100vh'}}>
             <AgGridReact 
                 onCellClicked={cellClickedListener}
-                rowData={rowData} 
+                onCellValueChanged={CellValueChanged}
+                rowData={merchants} 
                 columnDefs={columnDefs} 
                 defaultColDef={defaultColDef}
                 animateRows={true}
                 rowSelection='multiple'
                 rowHeight={32}
-                rowStyle={rowStyle}
                 suppressRowHoverHighlight={true}
             />
         </Container>

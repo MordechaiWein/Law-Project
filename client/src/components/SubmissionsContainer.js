@@ -1,11 +1,11 @@
 import React, { useContext } from 'react'
-import SubmissionsNavigation from '../pages/SubmissionsNavigation'
-import SubmissionsPage from '../pages/SubmissionsPage'
-import TemporaryLinkForm from './TemporaryLinkForm'
 import styles from '../styles/SubmissionsStyles'
-import { AppContext } from "./AppContext"
+import SubmissionsPage from '../pages/SubmissionsPage'
+import SubmissionsNavigation from '../pages/SubmissionsNavigation'
+import TemporaryLinkForm from './TemporaryLinkForm'
 import Container from '@mui/material/Container'
 import { useMediaQuery } from '@mui/material'
+import { AppContext } from "./AppContext"
 
 function SubmissionsContainer() {
 
@@ -22,7 +22,7 @@ function SubmissionsContainer() {
 
             <SubmissionsPage isMobile={isMobile} />
 
-            { signUpFormVisible ? <TemporaryLinkForm/> : null }
+            { signUpFormVisible ? <TemporaryLinkForm /> : null }
        
         </Container>
     )

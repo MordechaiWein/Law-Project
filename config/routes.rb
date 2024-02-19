@@ -5,6 +5,8 @@ Rails.application.routes.draw do
   delete '/logout', to: 'sessions#destroy'
   post '/one-time-signup-link', to: 'users#signup_link'
   post '/signup-link-confirmation', to: 'users#signup_link_confirmation'
+
+  resources :merchants, only: [:index, :create, :update]
   # Routing logic: fallback requests for React Router.
   # Leave this here to help deploy your app later!
   get "*path", to: "fallback#index", constraints: ->(req) { !req.xhr? && req.format.html? }

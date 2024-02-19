@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import styles from '../styles/DropZonesStyles'
+import React from 'react'
+import styles from '../styles/DropZoneStyles'
 import Box from '@mui/material/Box'
 import Grid from '@mui/material/Grid'
 import ListItem from '@mui/material/ListItem'
@@ -10,40 +10,10 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline'
 import { useMediaQuery } from '@mui/material'
 
-function DropZoneCard({ dropZone, handleDrop, files, fileErrors }) {
-
+function DropZoneCard({ dropZone, files, fileErrors, hoveredId, setHoveredId, handleDrop, removeFileClick }) {
+    
     const isMobile = useMediaQuery('(max-width: 1350px)')
-    const [hoveredId, setHoveredId] = useState(null)
-
-    // const [fileErrors, setFileErrors] = useState({ 
-    //     contract: false, 
-    //     paymentHistory: false, 
-    //     fundingConfirmation: false 
-    // }) 
-
-    // const [files, setFiles] = useState({ 
-    //     contract: "", 
-    //     paymentHistory: "", 
-    //     fundingConfirmation: ""
-    // })
-
-    // function handleDrop (event, keyName) { 
-    //     event.preventDefault()
-
-    //     setHoveredId(null)
-    //     const name = event.dataTransfer.files[0].name
-
-    //     if (name.includes("Resume") || name.includes("Payment") ||  name.includes("Funding")) {
-
-    //         setFiles({...files, [keyName] : event.dataTransfer.files[0].name})
-    //         setFileErrors({ ...fileErrors, [keyName]: false })
-    //     } else {
-
-    //         setFiles({...files, [keyName] : event.dataTransfer.files[0].name})
-    //         setFileErrors({ ...fileErrors, [keyName]: true })
-    //     }
-    // }
-
+    
     return (
 
         <Grid 
@@ -51,7 +21,7 @@ function DropZoneCard({ dropZone, handleDrop, files, fileErrors }) {
             xs={12} sm={6} md={4} 
             onDragOver={(e) => { e.preventDefault(); setHoveredId(dropZone.id); }} 
             onDragLeave={() => setHoveredId(null)} 
-            onDrop={(event) => handleDrop(event, dropZone.keyName)}
+            onDrop={(event) => handleDrop(event, dropZone)}
         >        
             <Box sx={hoveredId === dropZone.id ? styles.gridBoxAct : styles.gridBoxInact}>
                 <Box>
@@ -60,32 +30,43 @@ function DropZoneCard({ dropZone, handleDrop, files, fileErrors }) {
                     <Typography sx={styles.dzType}>Allowed file types {dropZone.type}</Typography>
                 </Box>
 
-                { files[dropZone.keyName] ?  
+                {isMobile ?
                     <>
-                        { isMobile ?
-                            <>
-                                { fileErrors[dropZone.keyName]  ?
-                                    <ErrorOutlineIcon sx={styles.errorIcn}/>         
-                                :
-                                    <CheckCircleIcon  sx={styles.checkIcn}/>
-                                }
-                            </>
+                        {fileErrors[dropZone.key]  ?
+
+                            <ErrorOutlineIcon sx={styles.errorIcn}/>         
                         :
                             <>
-                                { fileErrors[dropZone.keyName]  ?
-                                    <Typography sx={styles.error}>That file format is not supported.</Typography>
+                                { files[dropZone.key]  ?
+
+                                    <CheckCircleIcon  sx={styles.checkIcn} onClick={() => removeFileClick(dropZone)}/>
                                 :
-                                    <ListItem sx={styles.upload}>
-                                        <Typography sx={styles.fileNm}>{`${files[dropZone.keyName].slice(0, 32)}`}</Typography>
-                                        <CloseIcon fontSize='small' />  
-                                    </ListItem>
+                                    null
                                 }
                             </>
                         }
                     </>
-                    : 
-                    null
+                :
+                    <>
+                        {fileErrors[dropZone.key]  ?
+                        
+                            <Typography sx={styles.error}>Ensure correct document type and zone for file.</Typography>
+                        :
+                            <>
+                                {files[dropZone.key] ? 
+                                
+                                    <ListItem sx={styles.upload}>
+                                        <Typography sx={styles.fileNm}>{`${files[dropZone.key].name}`.slice(0, 32)}</Typography>
+                                        <CloseIcon fontSize='small' onClick={() => removeFileClick(dropZone)}/>
+                                    </ListItem>
+                                : 
+                                    null 
+                                }
+                            </>
+                        }
+                    </>
                 }
+
             </Box>
         </Grid>
     )

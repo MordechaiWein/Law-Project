@@ -7,7 +7,7 @@ const styles = {
 
     dlgLg: {
         borderRadius: '10px', 
-        padding: '100px',
+        padding: '100px'
     },
 
     title: {
@@ -36,7 +36,7 @@ const styles = {
     textField: {
         fontFamily: 'AmazonEmberRegular', 
         fontSize: '0.85rem',
-        height: '38px', 
+        height: '38px'
     },
 
     errors: {
@@ -49,20 +49,23 @@ const styles = {
 
     button: {
         fontFamily: 'AmazonEmberRegular', 
-        textTransform: 'none', 
-        boxShadow: 'none',  
         fontSize: '1.1rem', 
         fontWeight: 'bold', 
+        textTransform: 'none', 
+        boxShadow: 'none',  
         borderRadius: '0px',
-        marginBottom: '2rem',
-        backgroundColor: 'black',
-        '&:hover': { backgroundColor: 'black'}
+        marginBottom: '2rem'
     },
 
+    successIcon: {
+        fontSize: '1.8rem',
+        color: 'green',
+        mr: 0.3
+    },
+    
     emailSuccess: {
         fontFamily: 'AmazonEmberRegular', 
-        fontSize: '1.4rem',
-        fontWeight: 'bold',
+        fontSize: '1.2rem',
         textAlign: 'center'
     },
     
@@ -76,6 +79,6 @@ const styles = {
         fontSize: '1.1rem',
         color: 'red'
     }
-    
+       
 }
 export default styles

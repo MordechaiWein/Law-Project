@@ -11,7 +11,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles'
 import { AppContext } from "../components/AppContext"
 import { useHistory } from "react-router-dom"
 
-const defaultTheme = createTheme({ palette: { primary: { main: '#000000' }, secondary: { main: '#00559A' } } })
+const defaultTheme = createTheme({ palette: { primary: { main: '#00559A' } } })
 
 function SignUp({ pathname }) {
 
@@ -66,7 +66,7 @@ function SignUp({ pathname }) {
         setData({...data, [event.target.name] : event.target.value})
     }
     
-    // If the token is valid render the signup page, if it is not render the invalid token page. //
+    // If the token is valid render the Signup page, if it is not render the Invalid token page. //
     if (isLoading) return <div></div>
     if (!tokenValid) return <InvalidToken />
 
@@ -148,7 +148,7 @@ function SignUp({ pathname }) {
                         />
                         {errors.password_confirmation ? <Typography sx={styles.errors}>{errors.password_confirmation[0]}</Typography> : ''}
 
-                        <Button disableRipple fullWidth sx={styles.button} type="submit" variant="contained" color="secondary">Sign Up</Button>
+                        <Button disableRipple fullWidth sx={styles.button} type="submit" variant="contained">Sign Up</Button>
 
                         <Typography sx={styles.rules}>
                             Your signup link will expire shortly. Please sign up promptly. Thank you.

@@ -8,7 +8,11 @@ import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
 import { useMediaQuery } from '@mui/material'
 import { AppContext } from "./AppContext"
+import { createTheme, ThemeProvider } from '@mui/material/styles'
+import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import ReportGmailerrorredIcon from '@mui/icons-material/ReportGmailerrorred'
+
+const defaultTheme = createTheme({ palette: { primary: { main: '#000000' } } })
 
 function TemporaryLinkForm() {
 
@@ -17,16 +21,10 @@ function TemporaryLinkForm() {
     const [errors, setErrors] = useState( { nameError: '', emailError: '' } )
     const [emailSuccess, setEmailSuccess] = useState('')
     const [emailError, setEmailError] = useState('')
+
     const { setSignUpFormVisible } = useContext(AppContext)
     const isMobile = useMediaQuery('(max-width: 700px)')
     
-    const handleClose = () => { setOpen(false); setSignUpFormVisible(false); }
-
-    function handleChange(event) {
-        setErrors({ nameError: '', emailError: '' })
-        setData({...data, [event.target.name] : event.target.value})
-    }
-
     function handleSubmit(e) {
         e.preventDefault()
 
@@ -54,51 +52,63 @@ function TemporaryLinkForm() {
             setTimeout(() =>  setEmailError(''), 4000)
         }
     }
+    
+    function handleChange(event) {
+        setErrors({ nameError: '', emailError: '' })
+        setData({...data, [event.target.name] : event.target.value})
+    }
+
+    const handleClose = () => { setOpen(false); setSignUpFormVisible(false); }
 
     return (
-    
-        <Dialog maxWidth="xs" onClose={handleClose} open={open} PaperProps={{sx: isMobile ? styles.dlgSm : styles.dlgLg }}>
-            <Box component="form" onSubmit={handleSubmit}>
-                <Typography sx={styles.title}>Send Temporary Sign-Up Link</Typography>
-            
-                <Typography sx={styles.description}>
-                    Send a one-time, temporary registration link to an intended individual by filling out the form below.
-                </Typography>
-
-                <Typography sx={styles.label}>Recipient's Name</Typography>
-                <TextField 
-                    fullWidth 
-                    InputProps={{style: styles.textField}}
-                    error={errors.nameError ? true : false}
-                    autoComplete="off"
-                    onChange={handleChange}
-                    name="name"
-                    value={data.name}
-                />
-                <Typography sx={styles.errors}>{errors.nameError ?  errors.nameError : ""}</Typography>
-
-                <Typography sx={styles.label}>Recipient's Email</Typography>
-                <TextField 
-                    fullWidth   
-                    InputProps={{style: styles.textField}}
-                    error={errors.emailError ? true : false}
-                    autoComplete="off"
-                    onChange={handleChange}
-                    name="email"
-                    value={data.email}
-                />
-                <Typography sx={styles.errors}>{errors.emailError ?  errors.emailError : ""}</Typography>
-
-                <Button type="submit" disableRipple variant="contained" fullWidth sx={styles.button}>Send Link</Button>
+        
+        <ThemeProvider theme={defaultTheme}>
+            <Dialog maxWidth="xs" onClose={handleClose} open={open} PaperProps={{sx: isMobile ? styles.dlgSm : styles.dlgLg }}>
+                <Box component="form" onSubmit={handleSubmit}>
+                    <Typography sx={styles.title}>Send Temporary Sign-Up Link</Typography>
                 
-                <Typography sx={styles.emailSuccess}>{emailSuccess}</Typography>
+                    <Typography sx={styles.description}>
+                        Send a one-time, temporary registration link to an intended individual by filling out the form below.
+                    </Typography>
 
-                <Stack direction='row'>
-                    { emailError ? <ReportGmailerrorredIcon sx={styles.errorIcon}/> : null }
-                    <Typography sx={styles.emailError}>{emailError}</Typography>
-                </Stack>
-            </Box>
-        </Dialog>
+                    <Typography sx={styles.label}>Recipient's Name</Typography>
+                    <TextField 
+                        fullWidth 
+                        InputProps={{style: styles.textField}}
+                        error={errors.nameError ? true : false}
+                        autoComplete="off"
+                        onChange={handleChange}
+                        name="name"
+                        value={data.name}
+                    />
+                    <Typography sx={styles.errors}>{errors.nameError ? errors.nameError : ""}</Typography>
+
+                    <Typography sx={styles.label}>Recipient's Email</Typography>
+                    <TextField 
+                        fullWidth   
+                        InputProps={{style: styles.textField}}
+                        error={errors.emailError ? true : false}
+                        autoComplete="off"
+                        onChange={handleChange}
+                        name="email"
+                        value={data.email}
+                    />
+                    <Typography sx={styles.errors}>{errors.emailError ? errors.emailError : ""}</Typography>
+
+                    <Button type="submit" disableRipple variant="contained" fullWidth sx={styles.button}>Send Link</Button>
+                    
+                    <Stack direction='row' justifyContent='center'>
+                        { emailSuccess ? <CheckCircleIcon sx={styles.successIcon} /> : null }
+                        <Typography sx={styles.emailSuccess}>{emailSuccess}</Typography>
+                    </Stack>
+
+                    <Stack direction='row'>
+                        { emailError ? <ReportGmailerrorredIcon sx={styles.errorIcon}/> : null }
+                        <Typography sx={styles.emailError}>{emailError}</Typography>
+                    </Stack>
+                </Box>
+            </Dialog>
+        </ThemeProvider>
     )
 }
 export default TemporaryLinkForm

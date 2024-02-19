@@ -1,13 +1,12 @@
 const styles = {
 
     // ============= DropZoneCard.js ============= //
-
+                
     gridBoxInact: {
         height: {xs: '200px', sm: '200px', lg: '250px'},
         display: 'flex', 
         flexDirection: 'column', 
         border: 'dashed 2.5px #ccc', 
-        borderRadius: '10px',
         textAlign: 'center', 
         flexGrow: 1, 
         alignItems: 'center', 
@@ -21,13 +20,12 @@ const styles = {
         display: 'flex', 
         flexDirection: 'column', 
         border: 'dashed 2.5px #0099cc', 
-        borderRadius: '10px',
         textAlign: 'center', 
         flexGrow: 1, 
         alignItems: 'center', 
         color: "grey", 
         justifyContent: 'space-evenly',
-        padding: '0 30px 0 30px',
+        padding: '0 30px 0 30px'
     },
 
     downloadIcon: {
@@ -59,7 +57,7 @@ const styles = {
         justifyContent: 'space-between',
         backgroundColor: '#F5F5F5', 
         padding: '6px',
-        paddingLeft: '10px',
+        paddingLeft: '10px'
     },
 
     fileNm: {
@@ -72,13 +70,25 @@ const styles = {
         fontSize: '0.9rem',
         fontFamily: "AmazonEmberRegular",
         color: '#c62828',
-        padding: '5px',
+        padding: '5px'
     },
 
     // ============= DropZoneContainer.js ============= //
 
+    submitError: {
+        fontFamily: "AmazonEmberRegular",
+        color: '#c62828',
+        marginTop: '1rem'
+    },
+
+    resMessage: {
+        fontFamily: "AmazonEmberRegular",
+        fontWeight: 'bold',
+        marginTop: '2rem'
+    },
+
     button: {
-        marginTop: '3rem',
+        marginTop: '2rem',
         width: {xs: '12rem', sm: '12rem', lg: '30rem'},
         height: '3rem',
         fontFamily: "AmazonEmberRegular",

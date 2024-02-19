@@ -23,7 +23,7 @@ class UsersController < ApplicationController
         token = JWT.encode(payload, secret_key)
         begin
             UserMailer.with(name: name, email: email, token: token).sign_up_link_email.deliver_now
-            render json: { success: 'Invite link sent successfully 🎉' }
+            render json: {success: 'Invite link sent successfully.'}
         rescue StandardError
             render json: {error: 'Email delivery failed. Please verify email address.'}, status: :internal_server_error
         end
@@ -34,6 +34,7 @@ class UsersController < ApplicationController
         token = params[:pathname]
         secret_key = Figaro.env.JWT_SECRET_KEY
         decoded_token = JWT.decode(token, secret_key, true, algorithm: 'HS256')
+        head :no_content
     end
 
     private

@@ -54,3 +54,8 @@ gem "active_model_serializers", "~> 0.10.12"
 gem "jwt", "~> 2.7"
 
 gem "figaro", "~> 1.2"
+gem "pdf-reader", "~> 2.12"
+
+gem "rtesseract", "~> 3.1"
+
+gem "mini_magick", "~> 4.12"
