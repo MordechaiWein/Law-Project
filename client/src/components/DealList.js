@@ -1,7 +1,8 @@
 import React, { useMemo, useContext } from 'react'
 import { AppContext } from "./AppContext"
+import Big from 'big.js'
 import Container from '@mui/material/Container'
-import { useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom'
 import { AgGridReact } from 'ag-grid-react'
 import "ag-grid-community/styles/ag-grid.css"
 import "ag-grid-community/styles/ag-theme-quartz.css"
@@ -30,6 +31,31 @@ function DealList() {
         .then(data => editMerchant(data))
     }
 
+    function paybackAmounts(event, newValue) {
+        const divisor = new Big('26')
+        let paybackAmount = ''
+        if (event.colDef.field === "balance") {
+            paybackAmount = event.data.balance_pb_amount
+        } else if (event.colDef.field === "rtr_legal") {
+            paybackAmount = event.data.rtr_legal_pb_amount
+        } else {
+            paybackAmount = event.data.total_pb_amount
+        }
+        if (newValue != null) {
+            const cleanedNewValue = newValue.replace(/[^\d.-]/g, '')
+            const cleanedNewValueToInt = parseInt(cleanedNewValue)
+            if (!isNaN(cleanedNewValueToInt)) {
+                const dividend = new Big(cleanedNewValue)
+                const result = dividend.div(divisor)
+                const number = result.toNumber()  
+                const format = number.toLocaleString('en-US', { maximumFractionDigits: 3 })
+                paybackAmount = "$" + format
+                return paybackAmount
+            }
+        }
+        return paybackAmount
+    }
+
     function CellValueChanged(event) {
         if (event.colDef.field === "date_served") {
             if (event.data.date_served && event.data.date_served.match(dateRegex)) {
@@ -39,13 +65,27 @@ function DealList() {
                 const editData = {id: event.data.id, date_served: event.data.date_served, default_judgment: defaultJudgmentDate}
                 agGridCellSubmit(editData)
             } else {
-                const value = event.colDef.field
-                const editData = {id: event.data.id, [event.colDef.field]: event.data[value]}
+                const editData = {id: event.data.id, [event.colDef.field]: event.newValue}
                 agGridCellSubmit(editData)
             }
-        } else {
-            const value = event.colDef.field
-            const editData = {id: event.data.id, [event.colDef.field]: event.data[value]}
+        }
+        else if (event.colDef.field === "balance") {
+            const balancePbAmount = paybackAmounts(event, event.newValue)
+            const editData = {id: event.data.id, [event.colDef.field]: event.newValue, balance_pb_amount: balancePbAmount}
+            agGridCellSubmit(editData)
+        }
+        else if (event.colDef.field === "rtr_legal") {
+            const rtrLegalPbAmount = paybackAmounts(event, event.newValue)
+            const editData = {id: event.data.id, [event.colDef.field]: event.newValue, rtr_legal_pb_amount: rtrLegalPbAmount}
+            agGridCellSubmit(editData)
+        }
+        else if (event.colDef.field === "total") {
+            const totalPbAmount = paybackAmounts(event, event.newValue)
+            const editData = {id: event.data.id, [event.colDef.field]: event.newValue, total_pb_amount: totalPbAmount}
+            agGridCellSubmit(editData)
+        }
+        else {
+            const editData = {id: event.data.id, [event.colDef.field]: event.newValue}
             agGridCellSubmit(editData)
         }
     }
@@ -55,7 +95,7 @@ function DealList() {
         const judgmentDate = new Date(defaultJudgmentDate)
         return today >= judgmentDate
     }
-
+ 
     const columnDefs = [   
         { headerName: 'Name', field: 'merchants_legal_name_title_case', editable: false, cellClass: 'name-column'},
         { headerName: 'Date Submitted', field: 'created' },

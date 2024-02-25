@@ -1,13 +1,20 @@
 class UsersController < ApplicationController
+    skip_before_action :authorize, only: [:show, :create, :signup_link_confirmation]
 
     # Auto Log In.
     def show
-        user = User.find(session[:user_id])
-        render json: user, status: :created
+        if request.headers['X-Secret-Header'] == 'flatdragonswoopxzw337'
+            user = User.find(session[:user_id])
+            render json: user, status: :created
+        else
+            redirect_to 'http://localhost:4000/'
+        end
     end
 
     # Sign Up.
     def create
+        secret_key = Figaro.env.JWT_SECRET_KEY
+        decoded_token = JWT.decode(params[:token], secret_key, true, algorithm: 'HS256')
         user = User.create!(user_params)
         session[:user_id] = user.id
         render json: user, status: :created
@@ -41,6 +48,10 @@ class UsersController < ApplicationController
 
     def user_params
         params.permit(:name, :email, :company_name, :password, :password_confirmation)
+    end
+
+    def token_params
+        params.permit(:token)
     end
 
 end

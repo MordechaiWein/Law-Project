@@ -27,7 +27,8 @@ function SignUp({ pathname }) {
         email: '',
         company_name: '',
         password: '',
-        password_confirmation: ''   
+        password_confirmation: '',
+        token: pathname.slice(1)
     })
 
     // On component mount, perform an initial check to determine the validity of the token. //
@@ -56,7 +57,7 @@ function SignUp({ pathname }) {
             if (response.ok) {
                 response.json().then(data => { setUser(data); history.push('/'); })
             } else {
-                response.json().then(data => {setErrors(data.errors); console.log(data.errors);})
+                response.json().then(data => { data.errors && setErrors(data.errors) })    
             }
         })
     }

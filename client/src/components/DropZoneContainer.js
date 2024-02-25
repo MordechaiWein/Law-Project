@@ -25,11 +25,6 @@ function DropZoneContainer() {
         paymentHistory: '', 
         fundingConfirmation: '' 
     })
-    const [fileErrors, setFileErrors] = useState({
-        contract: false, 
-        paymentHistory: false, 
-        fundingConfirmation: false 
-    }) 
 
     const removeFileClick = (dropZone) => { setFiles( {...files, [dropZone.key]: ''} ); }
 
@@ -40,31 +35,23 @@ function DropZoneContainer() {
         setHoveredId(null) // Remove the hover border.
 
         const droppedFile = event.dataTransfer.files[0] // The file that was dropped in...
-
-        if (droppedFile.name.toLowerCase().includes(dropZone.name.toLowerCase())) {
-
-            setFiles({...files, [dropZone.key]: droppedFile })
-            setFileErrors({ ...fileErrors, [dropZone.key]: false })
-        } else {
-
-            setFileErrors({...fileErrors, [dropZone.key]: true })
-            setFiles({...files, [dropZone.key]: ''})
-        }
+        
+        setFiles({...files, [dropZone.key]: droppedFile }) 
     }
 
     // Submit function...
     function handleSubmit(e) {
         e.preventDefault()
-
+        
         if(files.contract && files.paymentHistory && files.fundingConfirmation) {
-
+            
             setSubmitError('')
-
+            
             const formData = new FormData() // Send the documents down as form data.
-            formData.append('contract', files.contract )
+            formData.append('contract', files.contract)
             formData.append('payment_history', files.paymentHistory)
-            formData.append('funding_confirmation', files.fundingConfirmation )
-
+            formData.append('funding_confirmation', files.fundingConfirmation)
+            
             setIsLoading(true)
             fetch('/merchants', {
                 method: 'POST',
@@ -77,11 +64,20 @@ function DropZoneContainer() {
                         setIsLoading(false)
                         setMerchants([...merchants, data])
                     })
-                } else { setResError(errorMessage); setIsLoading(false); }
+                } else { 
+                    response.json().then(data => {
+                        setResError(errorMessage); 
+                        setIsLoading(false);
+                        console.log(data.errors) 
+                    })
+                }
             })
+            .catch(() => {
+                setResError("Submission failed. Please try again. Avoid renaming and re-dropping files into different zones.")
+                setIsLoading(false)
+            })
+
             setFiles({contract: '', paymentHistory: '', fundingConfirmation: ''})
-            setTimeout(() =>  setResSuccess(""), 4000)
-            setTimeout(() =>  setResError(""), 4000)
 
         } else {
 
@@ -104,7 +100,6 @@ function DropZoneContainer() {
             dropZone={dropZone} 
             handleDrop={handleDrop}
             files={files}
-            fileErrors={fileErrors}
             hoveredId={hoveredId}
             setHoveredId={setHoveredId}
             removeFileClick={removeFileClick}
@@ -116,10 +111,14 @@ function DropZoneContainer() {
         <Box component="form" onSubmit={handleSubmit}>
 
             <Grid container spacing={4}>{gridItems}</Grid>
+        
+            {resSuccess ? 
+                <Alert severity="success" variant='filled' sx={styles.resMessage} onClose={() => setResSuccess("")}>{resSuccess}</Alert> : null 
+            }
 
-            {resSuccess ? <Alert severity="success" variant='filled' sx={styles.resMessage}>{resSuccess}</Alert> : null }
-
-            {resError ? <Alert severity="error" variant='filled' sx={styles.resMessage}>{resError}</Alert> : null}
+            {resError ? 
+                <Alert severity="error" variant='filled' sx={styles.resMessage} onClose={() => setResError("")}>{resError}</Alert> : null
+            }
 
             {submitError ? <Alert severity="error" sx={styles.submitError} onClose={() => setSubmitError("")}>{submitError}</Alert> : null}
             

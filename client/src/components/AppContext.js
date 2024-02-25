@@ -11,7 +11,9 @@ function MyProvider({children}) {
 
     useEffect(() => {
         setIsLoading(true)
-        fetch('/me')
+        fetch('/me', {
+            headers: {'X-Secret-Header': 'flatdragonswoopxzw337'}
+        })
         .then((response) => {
             if (response.ok) {
                 response.json().then(data => {
@@ -23,7 +25,9 @@ function MyProvider({children}) {
     },[])
 
     useEffect(() => {
-        fetch('/merchants')
+        fetch('/merchants', {
+            headers: {'X-Secret-Header': 'flatdragonswoopxzw337'}
+        })
         .then(response => response.json())
         .then(data => setMerchants(data))
     }, [])

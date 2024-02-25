@@ -21,6 +21,7 @@ function TemporaryLinkForm() {
     const [errors, setErrors] = useState( { nameError: '', emailError: '' } )
     const [emailSuccess, setEmailSuccess] = useState('')
     const [emailError, setEmailError] = useState('')
+    const [isLoading, setIsLoading] = useState(false)
 
     const { setSignUpFormVisible } = useContext(AppContext)
     const isMobile = useMediaQuery('(max-width: 700px)')
@@ -35,6 +36,7 @@ function TemporaryLinkForm() {
         setErrors({ nameError, emailError })
     
         if (!nameError && !emailError) {
+            setIsLoading(true)
             fetch('/one-time-signup-link', {
                 method: 'POST',
                 headers: { "Content-Type": "application/json" },
@@ -42,9 +44,15 @@ function TemporaryLinkForm() {
             })
             .then((response) => {
                 if (response.ok) {
-                    response.json().then(data => setEmailSuccess(data.success))
+                    response.json().then(data => {
+                        setEmailSuccess(data.success)
+                        setIsLoading(false)
+                    })
                 } else {
-                    response.json().then(data => setEmailError(data.error))
+                    response.json().then(data => {
+                        setEmailError(data.error)
+                        setIsLoading(false)
+                    })
                 }
             })
             setData({ name: '', email: '' })
@@ -95,7 +103,9 @@ function TemporaryLinkForm() {
                     />
                     <Typography sx={styles.errors}>{errors.emailError ? errors.emailError : ""}</Typography>
 
-                    <Button type="submit" disableRipple variant="contained" fullWidth sx={styles.button}>Send Link</Button>
+                    <Button type="submit" disableRipple variant="contained" fullWidth sx={styles.button}>
+                        {isLoading ? "Sending..." : "Send Link"}
+                    </Button>
                     
                     <Stack direction='row' justifyContent='center'>
                         { emailSuccess ? <CheckCircleIcon sx={styles.successIcon} /> : null }

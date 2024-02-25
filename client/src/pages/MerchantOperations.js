@@ -1,13 +1,15 @@
-import React from "react"
+import React, { useState } from "react"
 import styles from '../styles/MerchantStyles'
+import DocxTemplateGenerator from "./DocxTemplateGenerator"
 import Container from '@mui/material/Container'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
 
-function MerchantOperations({ isSmScr }) {
+function MerchantOperations({ isSmScr, merchant }) {
 
     const props = { variant: 'contained', disableRipple: true }
+    const [actionsFlag, setActionsFlag] = useState(false)
 
     if (isSmScr) return <Typography sx={styles.smScr}>Please access a wider screen for operation buttons.</Typography>
 
@@ -21,7 +23,7 @@ function MerchantOperations({ isSmScr }) {
                 <Box sx={styles.innerBoxOne}>
                     <Box sx={styles.innerBoxLt}>
                         <Button {...props} sx={styles.suitBtn}>Generate Settlement</Button>
-                        <Button {...props} sx={styles.suitBtn}>Generate Lawsuit</Button>
+                        <Button {...props} sx={styles.suitBtn} onClick={() => setActionsFlag(true)}>Generate Lawsuit</Button>
                         <Button {...props} sx={styles.suitBtn}>Generate Affidavit of Service</Button>
                         <Button {...props} sx={styles.suitBtn}>Generate Default Judgment</Button>
                         <Button {...props} sx={styles.suitBtn}>Generate Motion for SJ</Button>
@@ -72,6 +74,7 @@ function MerchantOperations({ isSmScr }) {
                 </Box> 
                    
             </Box>
+            {actionsFlag ? <DocxTemplateGenerator merchant={merchant} setActionsFlag={setActionsFlag} /> : null}
         </Container>
     )
 }

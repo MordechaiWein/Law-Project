@@ -21,10 +21,10 @@ function App() {
         <SubmissionsContainer />
       </Route>
       <Route exact path='/deal-list'>
-        <DealList />
+        {user.boss ? <DealList /> : <PageNotFound />}
       </Route>
       <Route exact path='/deal-list/:name'>
-        <MerchantsPage />
+        {user.boss ? <MerchantsPage /> : <PageNotFound />}
       </Route>
       <Route path="*">
         <PageNotFound />

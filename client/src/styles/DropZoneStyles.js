@@ -48,11 +48,6 @@ const styles = {
         fontSize: '2.3rem'
     },
 
-    errorIcn: {
-        color: '#c62828', 
-        fontSize: '2.3rem'
-    },
-
     upload: {
         justifyContent: 'space-between',
         backgroundColor: '#F5F5F5', 
@@ -64,13 +59,6 @@ const styles = {
         fontSize: '0.9rem',
         fontFamily: "AmazonEmberRegular",
         fontWeight: 'bold'
-    },
-
-    error: {
-        fontSize: '0.9rem',
-        fontFamily: "AmazonEmberRegular",
-        color: '#c62828',
-        padding: '5px'
     },
 
     // ============= DropZoneContainer.js ============= //

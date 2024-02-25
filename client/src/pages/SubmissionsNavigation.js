@@ -30,21 +30,23 @@ function SubmissionsNavigation({ isMobile }) {
                 ):(
                 <Box sx={styles.navBox}>
                     <Box sx={styles.boxMargin}>
-                        <ListItem>
-                            <FormatListBulletedOutlinedIcon/>
-                            <Link to="/deal-list" style={styles.link}>Deal list</Link>
-                        </ListItem>
-    
-                        {user.boss && user.name === "Martin Wein" ? 
-                            <ListItem sx={styles.linkMgBm}>
-                                <EmailOutlinedIcon />
-                                <Link onClick={() => setSignUpFormVisible(true)} to="/" style={styles.link}>Send sign up link</Link>
-                            </ListItem>
+                        {user.boss ?
+                            <>
+                                <ListItem>
+                                    <FormatListBulletedOutlinedIcon/>
+                                    <Link to="/deal-list" style={styles.link}>Deal list</Link>
+                                </ListItem>
+                
+                                <ListItem sx={styles.linkMgBm}>
+                                    <EmailOutlinedIcon />
+                                    <Link onClick={() => setSignUpFormVisible(true)} to="/" style={styles.link}>Send sign up link</Link>
+                                </ListItem>
+                                
+                                <Divider/>
+                            </>
                             :
                             null
                         }
-
-                        <Divider/>
                     </Box>
     
                     <Box sx={styles.boxMargin}>

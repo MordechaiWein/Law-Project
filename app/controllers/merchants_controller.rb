@@ -1,14 +1,24 @@
 class MerchantsController < ApplicationController
+    skip_before_action :authorize, only: [:index]
 
     def index
-        merchants = Merchant.all
-        render json: merchants
+        if request.headers['X-Secret-Header'] == 'flatdragonswoopxzw337'
+            merchants = Merchant.all
+            render json: merchants
+        else
+            redirect_to 'http://localhost:4000/'
+        end
     end
 
     def update
-        merchant = Merchant.find(params[:id])
-        merchant.update!(merchant_params)
-        render json: merchant  
+        user = User.find(session[:user_id])
+        if user.boss
+            merchant = Merchant.find(params[:id])
+            merchant.update!(merchant_params)
+            render json: merchant
+        else
+            render json: {error: "Not authorized"}, status: :unauthorized
+        end
     end
 
     def create
@@ -26,15 +36,9 @@ class MerchantsController < ApplicationController
         compiled_hash = {}
         integrated_hash = compiled_hash.merge(parse_contract, parse_payment_history, parse_funding_confirmation)
 
-        # render json: {text: parse_payment_history}
-
-        # Find the user.
+        # Find the user. Create a new row in the database. Render a json response with a "created" status code.
         user = User.find(session[:user_id])
-
-        # Create a row in both tables associated with the "user"...
         merchant = user.merchants.create!(integrated_hash)
-      
-        # Render a JSON response with a 'created' status: :code...
         render json: merchant, status: :created
     end
 
@@ -54,9 +58,13 @@ class MerchantsController < ApplicationController
             :ucc_status, 
             :law_firm, 
             :notes,
-            :contact_name_title_case,
+            :first_guarantor,
+            :first_guarantor_title_case, 
+            :second_guarantor,
+            :second_guarantor_title_case,
             :email_address,
-            :contact_numbers,
+            :mobile,
+            :business_phone,
             :second_guarantor,
             :second_guarantor_email, 
             :second_guarantor_phone,

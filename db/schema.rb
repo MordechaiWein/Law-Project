@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_02_19_000647) do
+ActiveRecord::Schema.define(version: 2024_02_25_070830) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -24,7 +24,6 @@ ActiveRecord::Schema.define(version: 2024_02_19_000647) do
     t.string "city"
     t.string "city_title_case"
     t.string "contact_name"
-    t.string "contact_name_title_case"
     t.string "d_b_a"
     t.string "d_b_a_p"
     t.string "d_b_a_title_case"
@@ -79,12 +78,13 @@ ActiveRecord::Schema.define(version: 2024_02_19_000647) do
     t.string "response_date"
     t.string "six_month_payoff_date"
     t.string "service"
-    t.string "contact_numbers"
     t.string "remittance_formatted"
     t.string "balance_pb_amount"
     t.string "rtr_legal_pb_amount"
     t.string "total_pb_amount"
     t.string "contract_payoff_date"
+    t.string "first_guarantor_title_case"
+    t.string "second_guarantor_title_case"
   end
 
   create_table "users", force: :cascade do |t|

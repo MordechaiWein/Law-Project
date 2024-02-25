@@ -1,9 +1,44 @@
 class Merchant < ApplicationRecord
     belongs_to :user
 
-    validates :agreement_date, :business_phone, :city, :city_title_case, :contact_name, :contact_name_title_case, :damages, :default_date, :email_address, :federal_tax_id, :first_guarantor, :image_date, :legal, :lender_legal_name, :lender_legal_name_title_case, :mail_title_case, :mailing_address, :merchants_legal_name, :merchants_legal_name_title_case, :mobile, :payment_frequency, :physical_address, :physical_city, :physical_state, :physical_zip, :purchase_price, :purchased_amount, :purchased_percentage, :remittance, :state, :state_of_incorporation, :type_of_entity, :type_of_entity_no_llc, :zip, presence: true
+    # Validations:
+    validates(
+        :agreement_date,
+        :business_phone,
+        :city,
+        :contact_name,
+        :damages,
+        :default_date,
+        :email_address,
+        :federal_tax_id,
+        :first_guarantor,
+        :image_date,
+        :legal,
+        :mailing_address,
+        :merchants_legal_name,
+        :mobile,
+        :payment_frequency,
+        :physical_address,
+        :physical_city,
+        :physical_state,
+        :physical_zip,
+        :purchase_price,
+        :purchased_amount,
+        :purchased_percentage,
+        :remittance,
+        :state,
+        :state_of_incorporation,
+        :type_of_entity,
+        :zip,
+        :balance,
+        :rtr_legal,
+        :total,
+        :created,
+        :contract_payoff_date,
+        presence: true
+    )
 
-
+    # Methods: 
     def Merchant.parse_contract_pdf(file_path)
 
         hash = {} 
@@ -84,14 +119,16 @@ class Merchant < ApplicationRecord
         hash[:and_2] = and_2
 
         # Split selected keys for formatting.
-        contact_name_array = hash[:contact_name].split(" ") 
+        first_guarantor_array = hash[:first_guarantor].split(" ")
+        second_guarantor_array = hash[:second_guarantor].split(" ")
         mail_array = hash[:mailing_address].split(" ") 
         dba_array = hash[:d_b_a].split(" ") 
         entity_array = hash[:type_of_entity].split(" ") 
         merchant_array = hash[:merchants_legal_name].split(" ") 
 
         # Title case some keys, lowercase others, manipulate others (see code)...
-        contact_titlecase = contact_name_array.map {|word| word.capitalize}.join(" ")
+        first_guarantor_titlecase = first_guarantor_array.map {|word| word.capitalize}.join(" ") 
+        second_guarantor_titlecase = second_guarantor_array.map {|word| word.capitalize}.join(" ") 
         mail_titlecase = mail_array.map {|word| word.capitalize}.join(" ")
         dba_titlecase = dba_array.map {|word| word.capitalize}.join(" ")
         city_titlecase = hash[:city].capitalize
@@ -105,7 +142,8 @@ class Merchant < ApplicationRecord
         end
 
         # Add the result to the hash...
-        hash[:contact_name_title_case] = contact_titlecase
+        hash[:first_guarantor_title_case] = first_guarantor_titlecase
+        hash[:second_guarantor_title_case] = second_guarantor_titlecase 
         hash[:mail_title_case] = mail_titlecase
         hash[:d_b_a_title_case] = dba_titlecase
         hash[:city_title_case] = city_titlecase
@@ -154,9 +192,6 @@ class Merchant < ApplicationRecord
         hash[:response_date] = ''
         hash[:six_month_payoff_date] = ''
         hash[:service] = ''
-
-        # WARNING!! - editing this key will not change the phone numbers in templates, This is a 'TEMPORARY' solution.
-        hash[:contact_numbers] = "Business: #{hash[:business_phone]} | Mobile: #{hash[:mobile]}"
 
         # WARNING!! - editing this key will not change the 'remittance' or 'payment_frequency' in templates, This is a 'TEMPORARY' solution.
         hash[:remittance_formatted] = "#{hash[:remittance]} - #{hash[:payment_frequency]}"
@@ -258,7 +293,7 @@ class Merchant < ApplicationRecord
             bounced_Fee = string_filter[0].to_i
         end
         # Add up all bounce fees.
-        total_bounce_fee  = bounced_fees.sum
+        total_bounce_fee = bounced_fees.sum
         # Get the balance with the below calculation:
         raw_balance = final_money_number - default_fee_number - total_bounce_fee
         # Format the balance.
@@ -362,4 +397,5 @@ class Merchant < ApplicationRecord
         # Return the hash.
         hash
     end
+
 end

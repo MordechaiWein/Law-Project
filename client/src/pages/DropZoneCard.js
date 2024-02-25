@@ -7,10 +7,9 @@ import Typography from '@mui/material/Typography'
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined'
 import CloseIcon from '@mui/icons-material/Close'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline'
 import { useMediaQuery } from '@mui/material'
 
-function DropZoneCard({ dropZone, files, fileErrors, hoveredId, setHoveredId, handleDrop, removeFileClick }) {
+function DropZoneCard({ dropZone, files, hoveredId, setHoveredId, handleDrop, removeFileClick }) {
     
     const isMobile = useMediaQuery('(max-width: 1350px)')
     
@@ -32,41 +31,29 @@ function DropZoneCard({ dropZone, files, fileErrors, hoveredId, setHoveredId, ha
 
                 {isMobile ?
                     <>
-                        {fileErrors[dropZone.key]  ?
+                        { files[dropZone.key]  ?
 
-                            <ErrorOutlineIcon sx={styles.errorIcn}/>         
+                            <CheckCircleIcon  sx={styles.checkIcn} onClick={() => removeFileClick(dropZone)}/>
                         :
-                            <>
-                                { files[dropZone.key]  ?
-
-                                    <CheckCircleIcon  sx={styles.checkIcn} onClick={() => removeFileClick(dropZone)}/>
-                                :
-                                    null
-                                }
-                            </>
+                            null
                         }
                     </>
                 :
                     <>
-                        {fileErrors[dropZone.key]  ?
+                        {files[dropZone.key] ? 
                         
-                            <Typography sx={styles.error}>Ensure correct document type and zone for file.</Typography>
-                        :
-                            <>
-                                {files[dropZone.key] ? 
-                                
-                                    <ListItem sx={styles.upload}>
-                                        <Typography sx={styles.fileNm}>{`${files[dropZone.key].name}`.slice(0, 32)}</Typography>
-                                        <CloseIcon fontSize='small' onClick={() => removeFileClick(dropZone)}/>
-                                    </ListItem>
-                                : 
-                                    null 
-                                }
-                            </>
+                            <ListItem sx={styles.upload}>
+
+                                <Typography sx={styles.fileNm}>{`${files[dropZone.key].name}`.slice(0, 32)}</Typography>
+
+                                <CloseIcon fontSize='small' onClick={() => removeFileClick(dropZone)}/>
+
+                            </ListItem>
+                        : 
+                            null 
                         }
                     </>
                 }
-
             </Box>
         </Grid>
     )

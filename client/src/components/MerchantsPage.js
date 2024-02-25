@@ -31,10 +31,11 @@ function MerchantsPage() {
     )
 
     const [data, setData] = useState({
-        contact_name_title_case: '',
+        first_guarantor_title_case: '',
         email_address: '',
-        contact_numbers: '',
-        second_guarantor: '',
+        mobile: '',
+        business_phone: '',
+        second_guarantor_title_case: '',
         second_guarantor_email: '',
         second_guarantor_phone: '',
         lawyer: '',
@@ -57,31 +58,32 @@ function MerchantsPage() {
     useEffect(() => {
         if (merchant) {
             setData({
-                contact_name_title_case: merchant.contact_name_title_case,
-                email_address:           merchant.email_address,
-                contact_numbers:         merchant.contact_numbers,
-                second_guarantor:        merchant.second_guarantor,
-                second_guarantor_email:  merchant.second_guarantor_email,
-                second_guarantor_phone:  merchant.second_guarantor_phone,
-                lawyer:                  merchant.lawyer,
-                lawyer_email:            merchant.lawyer_email,
-                lawyer_phone:            merchant.lawyer_phone,
-                suit_status:             merchant.suit_status,
-                litigation_date:         merchant.litigation_date,
-                response_date:           merchant.response_date,
-                balance:                 merchant.balance,
-                rtr_legal:               merchant.rtr_legal,
-                total:                   merchant.total,
-                remittance_formatted:    merchant.remittance_formatted,
-                six_month_payoff_date:   merchant.six_month_payoff_date,
-                service:                 merchant.service,
-                aos:                     merchant.aos,
-                ucc_status:              merchant.ucc_status,
-                contract_payoff_date:    merchant.contract_payoff_date
+                first_guarantor_title_case:   merchant.first_guarantor_title_case,
+                email_address:                merchant.email_address,
+                mobile:                       merchant.mobile,
+                business_phone:               merchant.business_phone,
+                second_guarantor_title_case:  merchant.second_guarantor_title_case,
+                second_guarantor_email:       merchant.second_guarantor_email,
+                second_guarantor_phone:       merchant.second_guarantor_phone,
+                lawyer:                       merchant.lawyer,
+                lawyer_email:                 merchant.lawyer_email,
+                lawyer_phone:                 merchant.lawyer_phone,
+                suit_status:                  merchant.suit_status,
+                litigation_date:              merchant.litigation_date,
+                response_date:                merchant.response_date,
+                balance:                      merchant.balance,
+                rtr_legal:                    merchant.rtr_legal,
+                total:                        merchant.total,
+                remittance_formatted:         merchant.remittance_formatted,
+                six_month_payoff_date:        merchant.six_month_payoff_date,
+                service:                      merchant.service,
+                aos:                          merchant.aos,
+                ucc_status:                   merchant.ucc_status,
+                contract_payoff_date:         merchant.contract_payoff_date
             })
         }
     }, [merchant])
-
+ 
     function paybackAmounts(rowId) {
         const cleanedBalance = data.balance.replace(/[^\d.-]/g, '')
         const cleanedRtrLegal = data.rtr_legal.replace(/[^\d.-]/g, '')
@@ -131,6 +133,8 @@ function MerchantsPage() {
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify({
                 ...data,
+                first_guarantor:     data.first_guarantor_title_case.toUpperCase(),
+                second_guarantor:    data.second_guarantor_title_case.toUpperCase(),
                 balance_pb_amount:   paybackAmountData.balancePbAmount,
                 rtr_legal_pb_amount: paybackAmountData.rtrLegalPbAmount,
                 total_pb_amount:     paybackAmountData.totalPbAmount
@@ -139,17 +143,19 @@ function MerchantsPage() {
         .then(response => response.json())
         .then(data => editMerchant(data))  
     }
+    
+    const handleChange =(event) => { setData({...data, [event.target.name]: event.target.value}) }
+    
+    const handleBsChange = (event) => { setData({...data, business_phone: event.target.value}) }
 
-    function handleChange(event) {
-        setData({...data, [event.target.name]: event.target.value})
-    }
+    const handleMbChange = (event) => { setData({...data, mobile: event.target.value}) }
 
     const leftGrid = [
         {
             id: 1,  
             key: 'Guarantor # 1 Name',
-            name: 'contact_name_title_case',      
-            value: data.contact_name_title_case
+            name: 'first_guarantor_title_case',      
+            value: data.first_guarantor_title_case
         },
         {
             id: 2,  
@@ -159,15 +165,15 @@ function MerchantsPage() {
         },
         {
             id: 3,  
-            key: 'Guarantor # 1 Phone',
-            name: 'contact_numbers',      
-            value: data.contact_numbers
+            key: 'Guarantor # 1 Phone',    
+            mobile: data.mobile,
+            business: data.business_phone
         },
         {
             id: 4,  
             key: 'Guarantor # 2 Name',
-            name: 'second_guarantor',       
-            value: data.second_guarantor
+            name: 'second_guarantor_title_case',       
+            value: data.second_guarantor_title_case
         },
         {
             id: 5,  
@@ -262,7 +268,6 @@ function MerchantsPage() {
         {
             id: 20, 
             key: 'Remittance', 
-            name: 'remittance_formatted',
             value: data.remittance_formatted
         },
         {
@@ -292,12 +297,26 @@ function MerchantsPage() {
     ]
 
     const merchantInfoGridLeft = leftGrid.map(row => (
-        <MerchantInfoItem key={row.id} row={row} handleChange={handleChange} handleSubmit={handleSubmit} />) 
-    )
+        <MerchantInfoItem 
+            key={row.id} 
+            row={row} 
+            handleChange={handleChange} 
+            handleSubmit={handleSubmit} 
+            handleBsChange={handleBsChange}
+            handleMbChange={handleMbChange}
+        />
+    ))
 
     const merchantInfoGridRight = rightGrid.map(row => (
-        <MerchantInfoItem key={row.id} row={row} handleChange={handleChange} handleSubmit={handleSubmit} />)
-    )
+        <MerchantInfoItem 
+            key={row.id} 
+            row={row} 
+            handleChange={handleChange} 
+            handleSubmit={handleSubmit}
+            handleBsChange={handleBsChange}
+            handleMbChange={handleMbChange}
+        />
+    ))
   
     return (
     
@@ -305,14 +324,14 @@ function MerchantsPage() {
             <Container style={{ maxWidth: isLgScr ? "2400px" : "100%" }} sx={isLgScr ? styles.contLg : styles.contSm}>
 
                 <Typography sx={styles.pageName}>{merchant.merchants_legal_name}</Typography>
-                 
+                  
                 <Box sx={styles.gridBox}>
                     <Grid container spacing={1} sx={styles.leftGrid}>{merchantInfoGridLeft}</Grid>
                     <Grid container spacing={1} sx={styles.rightGrid}>{merchantInfoGridRight}</Grid>
                 </Box>
 
                 <Divider />
-                <MerchantOperations isSmScr={isSmScr} />
+                <MerchantOperations isSmScr={isSmScr} merchant={merchant} />
 
             </Container>
         </ThemeProvider>
