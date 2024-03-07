@@ -22,8 +22,8 @@ function MerchantOperations({ isSmScr, merchant }) {
 
                 <Box sx={styles.innerBoxOne}>
                     <Box sx={styles.innerBoxLt}>
-                        <Button {...props} sx={styles.suitBtn}>Generate Settlement</Button>
                         <Button {...props} sx={styles.suitBtn} onClick={() => setActionsFlag(true)}>Generate Lawsuit</Button>
+                        <Button {...props} sx={styles.suitBtn}>Generate Settlement</Button>
                         <Button {...props} sx={styles.suitBtn}>Generate Affidavit of Service</Button>
                         <Button {...props} sx={styles.suitBtn}>Generate Default Judgment</Button>
                         <Button {...props} sx={styles.suitBtn}>Generate Motion for SJ</Button>

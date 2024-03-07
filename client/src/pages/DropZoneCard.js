@@ -24,7 +24,7 @@ function DropZoneCard({ dropZone, files, hoveredId, setHoveredId, handleDrop, re
         >        
             <Box sx={hoveredId === dropZone.id ? styles.gridBoxAct : styles.gridBoxInact}>
                 <Box>
-                    <FileDownloadOutlinedIcon sx={styles.downloadIcon}/>
+                    <FileDownloadOutlinedIcon sx={ files[dropZone.key] ? styles.downloadIconSuccess : styles.downloadIcon}/>
                     <Typography sx={styles.dzName}>{dropZone.name}</Typography>
                     <Typography sx={styles.dzType}>Allowed file types {dropZone.type}</Typography>
                 </Box>

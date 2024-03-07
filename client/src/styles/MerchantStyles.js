@@ -3,7 +3,7 @@ const styles = {
     // =============== MerchantsPage.js =============== //
 
     contLg: {
-        height: '100vh',
+        minHeight: '100vh',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-evenly',
@@ -17,6 +17,12 @@ const styles = {
         justifyContent: 'space-evenly'
     },
 
+    headerBox: {
+        display: 'flex', 
+        alignItems: "center", 
+        justifyContent: 'space-between'
+    },
+
     pageName: {
         fontFamily: 'AmazonEmberRegular',
         fontSize: { xs: '1.5rem', sm: '2rem', md: '2rem', lg: '3rem'},
@@ -25,10 +31,33 @@ const styles = {
         py: {xs: 4, sm: 0}
     },
 
-    gridBox: {
-        display: 'flex',   
+    arrowIcon: {
+        color: 'black',
+        cursor: 'pointer',
+        fontSize: { xs: '1.5rem', sm: '2.5rem', md: '3rem', lg: '3rem'},
+        '&:hover': { color: '#FFA500'}
+    },
+
+    homeIcon: {
+        color: 'black',
+        cursor: 'pointer',
+        fontSize: { xs: '1.5rem', sm: '2.5rem', md: '3rem', lg: '3rem'},
+        '&:hover': { color: '#FFA500'}
+    },
+
+    dashboard: {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
         boxShadow: '0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)',
-        padding: 5
+        px: 5,
+        pt: 5,
+        pb: 2
+    },
+
+    gridBox: {
+        display: 'flex',
+        mb: 2
     },
 
     leftGrid: {
@@ -39,6 +68,13 @@ const styles = {
     rightGrid: {
         width: '50%', 
         marginLeft: '0.8rem'
+    },
+
+    dataPage: {
+        fontFamily: 'AmazonEmberRegular',
+        cursor: 'pointer',
+        color: '#0099cc',
+        '&:hover': { color: '#FF9900' }
     },
     
     // ============= MerchantInfoItem.js ============= //

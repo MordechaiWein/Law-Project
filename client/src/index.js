@@ -5,7 +5,6 @@ import App from "./components/App";
 import { BrowserRouter as Router } from 'react-router-dom';
 import { MyProvider } from "./components/AppContext";
 
-
 ReactDOM.render(
   <Router>
     <MyProvider>

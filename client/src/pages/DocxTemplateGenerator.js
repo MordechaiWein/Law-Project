@@ -1,6 +1,8 @@
 import React, { useState } from "react"
 import styles from '../styles/DocxTemplateGeneratorStyles'
-import testDocument from '../templates/test document.docx'
+import oneMerchantOneGuarantor from '../templates/1 Merchant 1 Guarantor.docx'
+import oneMerchantTwoGuarantors from '../templates/1 Merchant 2 Guarantors.docx'
+import soleProprietor from '../templates/Sole Proprietor.docx'
 import Docxtemplater from 'docxtemplater'
 import PizZip from 'pizzip'
 import PizZipUtils from 'pizzip/utils/index.js'
@@ -21,7 +23,18 @@ function loadFile(url, callback) {
 }
 
 function DocxTemplateGenerator({ merchant, setActionsFlag }) {
-    
+
+    let docToBeGenerated = null
+
+    if (merchant.second_guarantor) {
+        docToBeGenerated = oneMerchantTwoGuarantors
+    }
+    else if (merchant.type_of_entity === "Sole Proprietorship" || merchant.first_guarantor === merchant.merchants_legal_name) {
+        docToBeGenerated = soleProprietor
+    } else {
+        docToBeGenerated = oneMerchantOneGuarantor
+    }
+   
     // Calculate and format the current date.
     const options = { year: 'numeric', month: 'long', day: '2-digit' }
     const todaysDate = new Date().toLocaleDateString('en-US', options)
@@ -34,13 +47,13 @@ function DocxTemplateGenerator({ merchant, setActionsFlag }) {
     const rawEntityArray = merchant.merchants_legal_name_title_case.split(" ")
     const filteredEntityArray = rawEntityArray.filter(word => word !== "The" && word !== "LLC" && word !== "INC" && word !== "")
     const entityArray = filteredEntityArray.map(word => word.replace(/,/g, ''))
-
+   
     // Component States...
     const [open, setOpen] = useState(true)
     const [generationError, setGenerationError] = useState("")
-
+ 
     const [buttonData, setButtonData] = useState({
-        court: 'Kings',
+        court: 'KINGS',
         entityShortName: null,
         firstGuarShortName: null,
         secondGuarShortName: null
@@ -51,7 +64,7 @@ function DocxTemplateGenerator({ merchant, setActionsFlag }) {
         firstGuarShortName: '',
         secondGuarShortName: ''
     })
-  
+
     // Component functions...
     function handleGenerateClick() {
 
@@ -68,13 +81,24 @@ function DocxTemplateGenerator({ merchant, setActionsFlag }) {
         if (merchant.second_guarantor_title_case && !allFieldsFilled) {
             setGenerationError('Please fill in all required fields before generating the document.')
         } 
-        else if (!merchant.second_guarantor_title_case && (!additionalData.entityShortName || !additionalData.firstGuarShortName)) {
+        else if (
+            (merchant.first_guarantor === merchant.merchants_legal_name || merchant.type_of_entity === "Sole Proprietorship") &&
+            !additionalData.entityShortName
+        ) {
             setGenerationError('Please fill in all required fields before generating the document.')
-        } 
+        }
+        else if (
+            !merchant.second_guarantor_title_case &&
+            merchant.first_guarantor !== merchant.merchants_legal_name &&
+            merchant.type_of_entity !== "Sole Proprietorship" &&
+            (!additionalData.entityShortName || !additionalData.firstGuarShortName)
+        ) {
+            setGenerationError('Please fill in all required fields before generating the document.')
+        }
         else {
             setGenerationError('')
             loadFile(
-                testDocument,
+                docToBeGenerated,
                 (error, content) => {
                     const zip = new PizZip(content);
                     const doc = new Docxtemplater(zip);
@@ -113,22 +137,22 @@ function DocxTemplateGenerator({ merchant, setActionsFlag }) {
                     <Box sx={styles.box}>
                         <Typography sx={styles.boxTitle}>Court</Typography>
                         <Button
-                            variant={buttonData.court === "Kings" ? "contained" : "outlined"}
-                            sx={buttonData.court === "Kings" ? styles.selected : styles.select}
+                            variant={buttonData.court === "KINGS" ? "contained" : "outlined"}
+                            sx={buttonData.court === "KINGS" ? styles.selected : styles.select}
                             onClick={handleSelectClick}
                             disableRipple
                             name="court"
-                            value="Kings"
+                            value="KINGS"
                         >
                             Kings
                         </Button>
                         <Button
-                            variant={buttonData.court === "Nassau" ? "contained" : "outlined"}
-                            sx={buttonData.court === "Nassau" ? styles.selected : styles.select}
+                            variant={buttonData.court === "NASSAU" ? "contained" : "outlined"}
+                            sx={buttonData.court === "NASSAU" ? styles.selected : styles.select}
                             onClick={handleSelectClick}
                             disableRipple
                             name="court"
-                            value="Nassau"
+                            value="NASSAU"
                         >
                             Nassau
                         </Button>
@@ -189,7 +213,7 @@ function DocxTemplateGenerator({ merchant, setActionsFlag }) {
 
                     <Divider/>
                     
-                    {firstGArray.length > 0 ?
+                    {firstGArray.length > 0 && merchant.first_guarantor !== merchant.merchants_legal_name ?
                         <>
                             <Box sx={styles.box}>
                                 <Typography sx={styles.boxTitle}>{merchant.first_guarantor_title_case}</Typography>

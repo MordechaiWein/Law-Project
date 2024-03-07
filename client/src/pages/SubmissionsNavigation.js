@@ -11,7 +11,7 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle'
 import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined'
 import FormatListBulletedOutlinedIcon from '@mui/icons-material/FormatListBulletedOutlined'
 
-function SubmissionsNavigation({ isMobile }) {
+function SubmissionsNavigation({ isMobile, hideNavbar }) {
     
     const {setUser, user, setSignUpFormVisible} = useContext(AppContext)
     
@@ -25,7 +25,7 @@ function SubmissionsNavigation({ isMobile }) {
     return (
     
         <>
-            {isMobile ? (
+            {isMobile || hideNavbar? (
                 null
                 ):(
                 <Box sx={styles.navBox}>

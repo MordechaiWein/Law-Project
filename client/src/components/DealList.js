@@ -1,22 +1,30 @@
 import React, { useMemo, useContext } from 'react'
 import { AppContext } from "./AppContext"
-import Big from 'big.js'
+import NameCellRenderer from './NameCellRenderer'
 import Container from '@mui/material/Container'
+import { useMediaQuery } from '@mui/material'
 import { useHistory } from 'react-router-dom'
 import { AgGridReact } from 'ag-grid-react'
 import "ag-grid-community/styles/ag-grid.css"
 import "ag-grid-community/styles/ag-theme-quartz.css"
+import Big from 'big.js'
 
 function DealList() {
 
-    const history = useHistory()
     const {merchants, editMerchant} = useContext(AppContext)
 
+    // Variables.
+    const history = useHistory()
+    const isLgScr = useMediaQuery('(min-width: 1850px)')
     const dateRegex = /^\d{2}\/\d{2}\/\d{2}$/
+    const autoSizeStrategy = { type: 'fitCellContents' }
+    const gridStyle = { height: '100vh', boxShadow: isLgScr ? '0 10px 15px rgba(0, 23, 81, 0.2)': 'none', padding: isLgScr ?  3 : 0 }
+    const wrap = { wrapHeaderText: true, autoHeaderHeight: true }
 
+    // Functions.
     function cellClickedListener(event) {
         if (event.colDef.field === 'merchants_legal_name_title_case') { 
-            const modifiedName = event.data.merchants_legal_name_title_case.replace(/ /g, '-')
+            const modifiedName = event.value.replace(/ /g, '-')
             history.push(`deal-list/${modifiedName}`)
         } 
     }
@@ -88,6 +96,11 @@ function DealList() {
             const editData = {id: event.data.id, [event.colDef.field]: event.newValue}
             agGridCellSubmit(editData)
         }
+        
+        const api = event.api
+        const columns = api.getColumns()
+        const columnIds = columns.map(column => column.colId)
+        api.autoSizeColumns(columnIds)
     }
 
     function isPastDefaultJudgment(defaultJudgmentDate) {
@@ -95,71 +108,78 @@ function DealList() {
         const judgmentDate = new Date(defaultJudgmentDate)
         return today >= judgmentDate
     }
+
+    // --------------------------- Cell Style Functions ------------------------- //
+    function filedUnfiledstyle(params) {
+        if (params.value && params.value.toLowerCase() === "not yet filed") {
+            return {color: '#ef5350'}
+        } 
+        if (params.value && params.value.toLowerCase() === "filed") {
+            return {color: '#4caf50'}
+        }
+    }
+
+    function dateServedStyle(params) {
+        if (params.value && params.value.toLowerCase() === "not yet served") {
+            return {color: '#ef5350'}
+        } 
+        if (params.value && params.value.match(dateRegex)) {
+            return {color: '#4caf50'}
+        }
+    }
+
+    function defJudgment(params) {
+        if(isPastDefaultJudgment(params.value)) {
+            return {color: '#4caf50'}
+        }
+    }
+
+    function uccStyle(params) {
+        if (params.value && params.value.toLowerCase() === "not yet started") {
+            return {color: '#ef5350'}
+        }
+        if (params.value && params.value.toLowerCase() === "complete") {
+            return {color: '#4caf50'}
+        }
+        if (params.value && params.value.toLowerCase() === "in process") {
+            return {color: '#0288d1'}
+        }
+    }
+    // ______________________________________________________________________________ //
  
+    // Columns.
     const columnDefs = [   
-        { headerName: 'Name', field: 'merchants_legal_name_title_case', editable: false, cellClass: 'name-column'},
-        { headerName: 'Date Submitted', field: 'created' },
-        { headerName: 'RTR', field: 'balance'},
-        { headerName: 'RTR + LEGAL', field: 'rtr_legal'}, 
-        { headerName: 'FULL', field: 'total'},
         { 
-            headerName: 'Suit Status', 
-            field: 'suit_status',
-            cellClassRules: {
-                'red-cell': (params) => params.value === 'Not yet filed',
-                'green-cell': (params) => params.value === 'Filled'
-            }
+            headerName: 'Name', 
+            field: 'merchants_legal_name_title_case', 
+            editable: false, 
+            cellClass: 'name-column',
+            cellRenderer: NameCellRenderer
         },
-        { 
-            headerName: 'AOS', 
-            field: 'aos',
-            cellClassRules: {
-                'red-cell': (params) => params.value === 'Not yet filed',
-                'green-cell': (params) => params.value === 'Filled'
-            }
-            
-        },
-        { 
-            headerName: 'Date Served', 
-            field: 'date_served',
-            cellClassRules: {
-                'red-cell': (params) => params.value === 'Not yet served',
-                'green-cell': (params) => params.value && params.value.match(dateRegex)
-            }
-        },
-        { 
-            headerName: 'Default Judgment', 
-            field: 'default_judgment',
-            editable: false,
-            cellClassRules: {
-                'green-cell': (params) => isPastDefaultJudgment(params.value)
-            }
-        },
-        { 
-            headerName: 'UCC Satuts', 
-            field: 'ucc_status',
-            cellClassRules: {
-                'red-cell': (params) => params.value === 'Not yet started',
-                'green-cell': (params) => params.value === 'Complete',
-                'blue-cell': (params) => params.value === 'In process',
-            }
-        },   
-        { headerName: 'Law Firm', field: 'law_firm'},
-        { headerName: 'Notes', field: 'notes'} 
+        { headerName: 'Date Submitted',   field: 'created',                                                                      ...wrap },
+        { headerName: 'RTR',              field: 'balance'                                                                               },
+        { headerName: 'RTR + LEGAL',      field: 'rtr_legal',                                                                    ...wrap }, 
+        { headerName: 'FULL',             field: 'total'                                                                                 },
+        { headerName: 'Suit Status',      field: 'suit_status',       cellStyle: params => filedUnfiledstyle(params)                     },
+        { headerName: 'AOS',              field: 'aos',               cellStyle: params => filedUnfiledstyle(params)                     },
+        { headerName: 'Date Served',      field: 'date_served',       cellStyle: params => dateServedStyle(params),              ...wrap },
+        { headerName: 'Default Judgment', field: 'default_judgment',  cellStyle: params => defJudgment(params), editable: false, ...wrap },
+        { headerName: 'UCC Satuts',       field: 'ucc_status',        cellStyle: params => uccStyle(params)                              },   
+        { headerName: 'Law Firm',         field: 'law_firm'                                                                              },
+        { headerName: 'Notes',            field: 'notes',                                                                resizable: true }
     ]
     
+    // Column settings.
     const defaultColDef = useMemo(() => ({
-        sortable: true,
         filter: true,
         editable: true,
-        width: 286.5,
-        cellClass: 'columns',
-        headerClass: 'header-style'
+        suppressMovable: true,
+        resizable: false,
     }), [])
 
+    // AG grid.
     return (
-
-        <Container disableGutters maxWidth={false} className='ag-theme-quartz' style={{width: '100%', height: '100vh'}}>
+        <Container disableGutters className='ag-theme-quartz' sx={gridStyle} style={{ maxWidth: isLgScr ? "2400px" : '100%'}}>
             <AgGridReact 
                 onCellClicked={cellClickedListener}
                 onCellValueChanged={CellValueChanged}
@@ -170,6 +190,7 @@ function DealList() {
                 rowSelection='multiple'
                 rowHeight={32}
                 suppressRowHoverHighlight={true}
+                autoSizeStrategy={autoSizeStrategy}
             />
         </Container>
     )

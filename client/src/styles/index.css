@@ -19,40 +19,25 @@ code {
 
 /*  ============ DealList.js AgGridReact Styles ============  */
 
-.header-style {
+.ag-theme-quartz {
+  --ag-cell-horizontal-border: solid #ccc !important;
+  --ag-header-column-separator-display: block !important;
+  --ag-grid-size: 5px !important;
+}
+
+.ag-header-cell-label {
+  justify-content: center ;
+  text-align: center;
+  width: 60px;
   font-weight: bold;
-  font-size: 1rem;
-  font-family: AmazonEmberRegular;
-  border-Bottom: solid 1px;
 }
 
 .name-column {
   color: #0099cc;
-  border: none !important;
   cursor: pointer;
 }
 
 .name-column:hover {
   color: #e06d33;
   text-decoration: underline;
-}
-
-.columns {
-  border-left: solid 1px #ccc !important;
-}
-
-.columns:focus {
-  border-left: solid 1px #2196f3 !important;
-}
-
-.red-cell {
-  color: #ef5350;
-}
-
-.green-cell {
-  color: #4caf50;
-}
-
-.blue-cell {
-  color: #0288d1;
 }

@@ -8,10 +8,11 @@ import { AppContext } from "../components/AppContext"
 import { useHistory } from "react-router-dom"
 import { createTheme, ThemeProvider } from '@mui/material/styles'
 import AccountCircleIcon from '@mui/icons-material/AccountCircle'
+import MenuIcon from '@mui/icons-material/Menu'
 
 const theme = createTheme({ breakpoints: { values: { xs: 0, sm: 600, md: 1500, lg: 1850 } } })
 
-function SubmissionsPage({ isMobile }) {
+function SubmissionsPage({ isMobile, setHideNavbar, hideNavbar }) {
 
     const history = useHistory()
     const {setUser, user} = useContext(AppContext)
@@ -24,8 +25,8 @@ function SubmissionsPage({ isMobile }) {
     return (
 
         <ThemeProvider theme={theme}>
-            <Container maxWidth="xl" sx={styles.secondBox}> 
-
+            <Container maxWidth="xl" sx={hideNavbar ? styles.secondBoxLg : styles.secondBox}> 
+                <MenuIcon fontSize="large" sx={styles.menuIcon} onClick={() => setHideNavbar(!hideNavbar)}/>
                 <Box>
                     <Typography color="text.primary" sx={styles.coName}>Your-Company-Name-Here</Typography>
                     <Typography color="text.secondary" sx={styles.cCoName}>Client-Company-Name-Here</Typography>

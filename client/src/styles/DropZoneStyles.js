@@ -32,6 +32,11 @@ const styles = {
         fontSize: 45
     },
 
+    downloadIconSuccess: {
+        fontSize: 45,
+        color: '#2e7d32'
+    },
+
     dzName: {
         fontSize: '1.4rem', 
         fontWeight: 'bold',

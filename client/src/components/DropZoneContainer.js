@@ -9,9 +9,6 @@ import { AppContext } from "./AppContext"
 
 function DropZoneContainer() {
 
-    const successMessage = 'Documents parsed successfully. See deal list to view your added information.'
-    const errorMessage = 'Document parsing failed. The App currently supports limited file formats. Contact admin for assistance.'
-
     const {merchants, setMerchants} = useContext(AppContext)
 
     // Component States...
@@ -60,15 +57,15 @@ function DropZoneContainer() {
             .then((response) => {
                 if (response.ok) {
                     response.json().then(data => {
-                        setResSuccess(successMessage)
+                        setResSuccess(data.message)
                         setIsLoading(false)
-                        setMerchants([...merchants, data])
+                        setMerchants([...merchants, data.merchant])
                     })
                 } else { 
                     response.json().then(data => {
-                        setResError(errorMessage); 
-                        setIsLoading(false);
-                        console.log(data.errors) 
+                        setResError(data.error)
+                        setIsLoading(false)
+                        console.log(data.errors)
                     })
                 }
             })

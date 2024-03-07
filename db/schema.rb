@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_02_25_070830) do
+ActiveRecord::Schema.define(version: 2024_03_07_051729) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -18,14 +18,11 @@ ActiveRecord::Schema.define(version: 2024_02_25_070830) do
   create_table "merchants", force: :cascade do |t|
     t.integer "user_id"
     t.string "agreement_date"
-    t.string "and_1"
-    t.string "and_2"
     t.string "business_phone"
     t.string "city"
     t.string "city_title_case"
     t.string "contact_name"
     t.string "d_b_a"
-    t.string "d_b_a_p"
     t.string "d_b_a_title_case"
     t.string "damages"
     t.string "default_date"
@@ -78,7 +75,6 @@ ActiveRecord::Schema.define(version: 2024_02_25_070830) do
     t.string "response_date"
     t.string "six_month_payoff_date"
     t.string "service"
-    t.string "remittance_formatted"
     t.string "balance_pb_amount"
     t.string "rtr_legal_pb_amount"
     t.string "total_pb_amount"

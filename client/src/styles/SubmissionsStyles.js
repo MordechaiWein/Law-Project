@@ -75,7 +75,21 @@ const styles = {
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-evenly',
-        padding: '1rem 0 2rem 0'
+        padding: '0 0 2rem 0'
+    },
+
+    secondBoxLg: {
+        width: '100%',
+        textAlign: 'center',
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-evenly',
+        padding: '0 0 2rem 0'
+    },
+
+    menuIcon: {
+        cursor: 'pointer'
     },
 
     coName: {

@@ -2,7 +2,7 @@ const styles = {
     
     paperProps: {
         px: 7,
-        pb: 7,
+        pb: 5,
         pt: 5,
         height: '550px'
     },
@@ -77,7 +77,7 @@ const styles = {
         width: '500px',
         alignSelf: 'center', 
         p: 1, 
-        mt: 2
+        mt: 1
     },
 
     error: {
@@ -86,6 +86,6 @@ const styles = {
         alignSelf: 'center',
         paddingTop: '0.7rem' 
     }
-
+    
 }
 export default styles

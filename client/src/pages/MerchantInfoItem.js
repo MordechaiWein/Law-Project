@@ -6,7 +6,7 @@ import Typography from '@mui/material/Typography'
 import TextField from '@mui/material/TextField'
 import InputAdornment from '@mui/material/InputAdornment'
 
-function MerchantInfoItem({row, handleChange, handleSubmit, handleBsChange, handleMbChange }) {
+function MerchantInfoItem({row}) {
     
     return (
     
@@ -16,20 +16,22 @@ function MerchantInfoItem({row, handleChange, handleSubmit, handleBsChange, hand
                     <Typography sx={styles.key}>{row.key}</Typography>
                     <Stack direction="row"> 
                         <TextField 
-                            autoComplete='off'
                             fullWidth 
                             value={row.mobile ? row.mobile : ''}
-                            onChange={handleMbChange}
-                            onKeyDown={ (event) => { if (event.key === 'Enter') { handleSubmit(event, row.id) } } }
-                            InputProps={{style: styles.value, startAdornment: (<InputAdornment position="start">Mb:</InputAdornment>) }}
+                            InputProps={{
+                                style: styles.value, 
+                                readOnly: true,
+                                startAdornment: (<InputAdornment position="start">Mb:</InputAdornment>) 
+                            }}
                         /> 
                         <TextField 
-                            autoComplete='off'
                             fullWidth 
                             value={row.business ? row.business : ''}
-                            onChange={handleBsChange}
-                            onKeyDown={ (event) => { if (event.key === 'Enter') { handleSubmit(event, row.id) } } }
-                            InputProps={{style: styles.value, startAdornment: (<InputAdornment position="start">Bs:</InputAdornment>) }}
+                            InputProps={{
+                                style: styles.value, 
+                                readOnly: true,
+                                startAdornment: (<InputAdornment position="start">Bs:</InputAdornment>) 
+                            }}
                         />     
                     </Stack>
                 </>
@@ -37,13 +39,9 @@ function MerchantInfoItem({row, handleChange, handleSubmit, handleBsChange, hand
                 <Stack direction="column"> 
                     <Typography sx={styles.key}>{row.key}</Typography>
                     <TextField 
-                        autoComplete='off'
                         fullWidth 
-                        InputProps={{style: styles.value}} 
+                        InputProps={{style: styles.value, readOnly: true}} 
                         value={row.value ? row.value : ''}
-                        name={row.name}
-                        onChange={handleChange}
-                        onKeyDown={ (event) => { if (event.key === 'Enter') { handleSubmit(event, row.id) } } }
                     />    
                 </Stack>
             }
