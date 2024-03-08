@@ -60,3 +60,5 @@ gem "pdf-reader", "~> 2.12"
 gem "rtesseract", "~> 3.1"
 
 gem "mini_magick", "~> 4.12"
+
+gem "aws-sdk-s3", require: false

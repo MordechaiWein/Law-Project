@@ -1,31 +1,27 @@
 import React, { useState, useEffect, useContext } from "react"
+import MerchantDataField from "../pages/MerchantDataField"
+import styles from "../styles/MerchantStyles"
 import Container from '@mui/material/Container'
 import Box from '@mui/material/Box'
 import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
-import MerchantDataItem from "./MerchantDataItem"
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
+import { AppContext } from "./AppContext"
 import Big from 'big.js'
-import { AppContext } from "../components/AppContext"
 
 function MerchantData({ merchant, setDataPageFlag }) {
 
+    // Context.
     const { editMerchant } = useContext(AppContext)
-    const dateRegex = /^\d{2}\/\d{2}\/\d{2}$/
 
-    const [utils, setUtils] = useState({
-        balPb:        '',
-        rtrLegalPb:   '',
-        totalPb:      '',
-        defJudgment:  '',
-        ctrctPoDate:  ''
+    // States.
+    const [computedData, setComputedData] = useState({
+        balancePayback:   '',
+        rtrLegalPayback:  '',
+        totalPayback:     '',
+        defJudgment:      '',
+        contractPayDate:  ''
     })
-
-    let balancePaybackAmount = utils.balPb
-    let rtrLegalPaybackAmount = utils.rtrLegalPb
-    let totalPaybackAmount = utils.totalPb 
-    let defaultJudgment = utils.defJudgment
-    let contractPayoffDate = utils.ctrctPoDate
 
     const [data, setData] = useState({
         agreement_date:                  '',
@@ -82,12 +78,12 @@ function MerchantData({ merchant, setDataPageFlag }) {
 
     useEffect(() => {
         if(merchant) {
-            setUtils({
-                balPb:        merchant.balance_pb_amount,
-                rtrLegalPb:   merchant.rtr_legal_pb_amount,
-                totalPb:      merchant.total_pb_amount,
-                defJudgment:  merchant.default_judgment,
-                ctrctPoDate:  merchant.contract_payoff_date
+            setComputedData({
+                balancePayback:   merchant.balance_pb_amount,
+                rtrLegalPayback:  merchant.rtr_legal_pb_amount,
+                totalPayback:     merchant.total_pb_amount,
+                defJudgment:      merchant.default_judgment,
+                contractPayDate:  merchant.contract_payoff_date
             })
         }
     },[merchant])
@@ -126,7 +122,7 @@ function MerchantData({ merchant, setDataPageFlag }) {
                 physical_address:                merchant.physical_address,
                 physical_city:                   merchant.physical_city,
                 physical_state:                  merchant.physical_state,
-                physical_zip:                    merchant.zip,
+                physical_zip:                    merchant.physical_zip,
                 purchase_price:                  merchant.purchase_price,
                 purchased_amount:                merchant.purchased_amount,
                 purchased_percentage:            merchant.purchased_percentage,
@@ -149,51 +145,71 @@ function MerchantData({ merchant, setDataPageFlag }) {
         }
     },[merchant])
 
+    // Variables.
+
     const entityArr = data.type_of_entity.split(" ")
     const entityArrayFormatted = entityArr[entityArr.length -1].includes("LLC") ? entityArr.slice(0, -1) : entityArr
     const typeOfEntityNoLlc = entityArrayFormatted.join(" ").toLowerCase()
 
-    function calculatePayoffDateToBeRenamed(purchasedAmount, paymentFrequency, remittance) {
+    // Date Regex Pattern.
+    const dateRegex = /^\d{2}\/\d{2}\/\d{2}$/
+
+    // Date formatting options.
+    const options = {month: '2-digit', day: '2-digit', year: '2-digit'}
+
+    // let variables.
+    let balancePaybackAmount  =  computedData.balancePayback
+    let rtrLegalPaybackAmount =  computedData.rtrLegalPayback
+    let totalPaybackAmount    =  computedData.totalPayback 
+    let defaultJudgment       =  computedData.defJudgment
+    let contractPayoffDate    =  computedData.contractPayDate 
+
+    // Functions.
+
+    // Calculate the Contract Payoff Date...
+    function calculatePayoffDate(purchasedAmount, paymentFrequency, remittance) {
+        const agreementDate= new Date(data.agreement_date)
+
         const cleanedPurchasedAmount = purchasedAmount.replace(/[^\d.-]/g, '')
         const cleanedRemittance = remittance.replace(/[^\d.-]/g, '')
 
-        const purchasedAmountNum = parseInt(cleanedPurchasedAmount)
+        const purchasedAmtNum = parseInt(cleanedPurchasedAmount)
         const remittanceNum = parseInt(cleanedRemittance)
-        const purchasedAmountDividedByRemittance = purchasedAmountNum / remittanceNum
+        const ratio = purchasedAmtNum / remittanceNum
 
-        const wholeNumber = Math.round(purchasedAmountDividedByRemittance)
+        const wholeNumber = Math.round(ratio)
 
-        const agreementDate= new Date(data.agreement_date)
-      
         if(paymentFrequency.toLowerCase() === "weekly") {
             agreementDate.setDate(agreementDate.getDate() +  wholeNumber * 7)
-            const resDate = agreementDate.toLocaleDateString('en-US', {month: '2-digit', day: '2-digit', year: '2-digit'})
-            return resDate
+            const payoffDate = agreementDate.toLocaleDateString('en-US', options)
+            return payoffDate
         }
         else if (paymentFrequency.toLowerCase() === "daily") {
             agreementDate.setDate(agreementDate.getDate() +  wholeNumber)
-            const resDate = agreementDate.toLocaleDateString('en-US', {month: '2-digit', day: '2-digit', year: '2-digit'})
-            return resDate
+            const payoffDate = agreementDate.toLocaleDateString('en-US', options)
+            return payoffDate
         }
         else { return "Invalid Date" }
     }
 
-    function dateFuncToBeRnamed(placeholder) {
-        if (placeholder.match(dateRegex)) {
-            const servedDate = new Date(placeholder)
+    // Calculate the Default Judgment date ( 35 days after 'date served' )...
+    function calculateDefaultJudgment(dateServed) {
+        if (dateServed.match(dateRegex)) {
+            const servedDate = new Date(dateServed)
             servedDate.setDate(servedDate.getDate() + 35)
-            const defaultJudgmentDate = servedDate.toLocaleDateString('en-US', {month: '2-digit', day: '2-digit', year: '2-digit'})
+            const defaultJudgmentDate = servedDate.toLocaleDateString('en-US', options)
             return defaultJudgmentDate
         }  
         else { return 'Not a date...' }
     }
 
-    function funcToBeRnamed(placeholder) {
+    // Calculate Payback Amounts (amount divided by 26)...
+    function calculatePaybackAmount(amount) {
         const divisor = new Big('26')
-        const cleanedPlaceholder = placeholder.replace(/[^\d.-]/g, '')
-        const integer = parseInt(cleanedPlaceholder)
-        if (!isNaN(integer)) {
-            const dividend = new Big(cleanedPlaceholder)
+        const cleanedAmount = amount.replace(/[^\d.-]/g, '')
+        const amountToInt = parseInt(cleanedAmount)
+        if (!isNaN(amountToInt)) {
+            const dividend = new Big(cleanedAmount)
             const result = dividend.div(divisor)
             const number = result.toNumber() 
             const format = number.toLocaleString('en-US', { maximumFractionDigits: 3 })
@@ -202,31 +218,33 @@ function MerchantData({ merchant, setDataPageFlag }) {
         else { return null }
     }
 
-    function paybackAmountFunction(rowId) {
+    // Upon 'Blur' update specific fields based on other fields...
+    function updateMerchantData(rowId) {
         if (rowId === 37) {
-            const res = funcToBeRnamed(data.balance) 
+            const res = calculatePaybackAmount(data.balance) 
             balancePaybackAmount = !isNaN(res) ? balancePaybackAmount : "$" + res
         }
         if (rowId === 39) {
-            const res = funcToBeRnamed(data.rtr_legal)
+            const res = calculatePaybackAmount(data.rtr_legal)
             rtrLegalPaybackAmount = !isNaN(res) ? rtrLegalPaybackAmount :  "$" + res 
         }
         if (rowId === 41) {
-            const res = funcToBeRnamed(data.total)
+            const res = calculatePaybackAmount(data.total)
             totalPaybackAmount = !isNaN(res) ? totalPaybackAmount : "$" + res
         }
         if (rowId === 34) {
-            const res = dateFuncToBeRnamed(data.date_served)
+            const res = calculateDefaultJudgment(data.date_served)
             defaultJudgment = res.match(dateRegex) ? res : defaultJudgment
         }
         if (rowId === 24 || rowId === 25 || rowId === 44) {
-            const res = calculatePayoffDateToBeRenamed(data.purchased_amount, data.payment_frequency, data.remittance)
+            const res = calculatePayoffDate(data.purchased_amount, data.payment_frequency, data.remittance)
             contractPayoffDate = res === "Invalid Date" ? contractPayoffDate : res
         }
     }
 
-    function handleSubmit(rowId) {
-        paybackAmountFunction(rowId)
+    // Send PATCH request to the backend...
+    function handleBlur(rowId) {
+        updateMerchantData(rowId)
         fetch(`/merchants/${merchant.id}`, {
             method: 'PATCH',
             headers: {"Content-Type": "application/json"},
@@ -250,10 +268,12 @@ function MerchantData({ merchant, setDataPageFlag }) {
         .then(data => editMerchant(data))  
     }
 
+    // Update fields dynamically.
     const handleChange = (event) => { setData({...data, [event.target.name]: event.target.value}) }
 
-    const handlePaybacksChange = (event) => { setUtils({...utils, [event.target.name]: event.target.value}) }
+    const handleComputedChange = (event) => { setComputedData({...computedData, [event.target.name]: event.target.value}) }
 
+    // gridarray = An 'ARRAY' of 'OBJECTS' to be mapped through to create a grid item 'COMPONENT for each...
     const gridArray = [
         {
             id: 1,  
@@ -298,7 +318,7 @@ function MerchantData({ merchant, setDataPageFlag }) {
             value: data.lender_legal_name_title_case
         },
         {
-            // **** This field cannot be edited. **** //
+            // **** This field cannot be edited **** //
             id: 8,
             key: 'Merchants Legal Name',
             value: data.merchants_legal_name_title_case
@@ -480,8 +500,8 @@ function MerchantData({ merchant, setDataPageFlag }) {
         {
             id: 38, 
             key: 'RTR Payback Amount', 
-            name: 'balPb',
-            value: utils.balPb
+            name: 'balancePayback',
+            value: computedData.balancePayback
         },
         {
             id: 39, 
@@ -492,8 +512,8 @@ function MerchantData({ merchant, setDataPageFlag }) {
         {
             id: 40, 
             key: 'RTR + Legal Payback Amount', 
-            name: 'rtrLegalPb',
-            value: utils.rtrLegalPb
+            name: 'rtrLegalPayback',
+            value: computedData.rtrLegalPayback
         },
         {
             id: 41, 
@@ -504,15 +524,15 @@ function MerchantData({ merchant, setDataPageFlag }) {
         {
             id: 42, 
             key: 'Full Payback Amount',
-            name: 'totalPb',
-            value: utils.totalPb
+            name: 'totalPayback',
+            value: computedData.totalPayback
         },
 
         {
             id: 43, 
             key: 'Contract Payoff Date',
-            name: 'ctrctPoDate', 
-            value: utils.ctrctPoDate
+            name: 'contractPayDate', 
+            value: computedData.contractPayDate 
         },
         {
             id: 44,
@@ -560,7 +580,7 @@ function MerchantData({ merchant, setDataPageFlag }) {
             id: 51,
             key: 'Default Judgment',
             name: 'defJudgment',
-            value: utils.defJudgment
+            value: computedData.defJudgment
         },
         {
             id: 52, 
@@ -582,51 +602,27 @@ function MerchantData({ merchant, setDataPageFlag }) {
         }
     ]
     
+    // Array Map...
     const gridItems = gridArray.map(row => (
-        <MerchantDataItem
+        <MerchantDataField
             key={row.id} 
             row={row} 
             handleChange={handleChange} 
-            handleSubmit={handleSubmit} 
-            handlePaybacksChange={handlePaybacksChange}
+            handleComputedChange={handleComputedChange}
+            handleBlur={handleBlur}  
         />
     ))
-
-
+    
     return (
-        <Container maxWidth={false} sx={{ pb: 10 }}>
-            <Box 
-                sx={{ 
-                    display: 'flex', 
-                    alignItems: 'baseline', 
-                    justifyContent: 'space-between' 
-                }}
-            >
-                <Typography 
-                    sx={{ 
-                        fontWeight: 'bold', 
-                        textAlign: 'center', 
-                        pt: 2, 
-                        pb: 5, 
-                        fontSize: '2.5rem', 
-                        fontFamily: 'AmazonEmberRegular',
-                        marginLeft: 'auto',
-                        marginRight: 'auto' 
-                    }}>
-                        Merchant Data Summary
-                    </Typography>
-                <ArrowForwardIcon 
-                    fontSize="large" 
-                    onClick={() => setDataPageFlag(false)}
-                    sx={{ 
-                        color: 'black',
-                        cursor: 'pointer',
-                        '&:hover': { color: '#FFA500'}
-                    }}
-                />
+
+        <Container maxWidth={false} sx={styles.dataContainer}>
+            <Box sx={styles.dataBox}>
+                <Typography sx={styles.dataTitle}>Merchant Data Summary</Typography>
+                <ArrowForwardIcon fontSize="large" sx={styles.dataArrow} onClick={() => setDataPageFlag(false)} />
             </Box>
+
             <Grid container spacing={2}>{gridItems}</Grid>
-</Container>
+        </Container>
     )
 }
 export default MerchantData

@@ -4,9 +4,8 @@ import Grid from '@mui/material/Grid'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import TextField from '@mui/material/TextField'
-import InputAdornment from '@mui/material/InputAdornment'
 
-function MerchantInfoItem({row}) {
+function MerchantsPageTab({row}) {
     
     return (
     
@@ -18,34 +17,26 @@ function MerchantInfoItem({row}) {
                         <TextField 
                             fullWidth 
                             value={row.mobile ? row.mobile : ''}
-                            InputProps={{
-                                style: styles.value, 
-                                readOnly: true,
-                                startAdornment: (<InputAdornment position="start">Mb:</InputAdornment>) 
-                            }}
+                            InputProps={{style: styles.value, readOnly: true}}
                         /> 
                         <TextField 
                             fullWidth 
                             value={row.business ? row.business : ''}
-                            InputProps={{
-                                style: styles.value, 
-                                readOnly: true,
-                                startAdornment: (<InputAdornment position="start">Bs:</InputAdornment>) 
-                            }}
+                            InputProps={{style: styles.value, readOnly: true}}
                         />     
                     </Stack>
                 </>
                 :
                 <Stack direction="column"> 
                     <Typography sx={styles.key}>{row.key}</Typography>
-                    <TextField 
+                    <TextField
                         fullWidth 
-                        InputProps={{style: styles.value, readOnly: true}} 
                         value={row.value ? row.value : ''}
-                    />    
+                        InputProps={{style: styles.value, readOnly: true}} 
+                    />  
                 </Stack>
             }
         </Grid>  
     )
 }
-export default MerchantInfoItem
+export default MerchantsPageTab
