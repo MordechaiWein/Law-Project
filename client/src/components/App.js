@@ -4,6 +4,7 @@ import Login from './Login'
 import SubmissionsContainer from './SubmissionsContainer'
 import DealList from './DealList'
 import MerchantsPage from './MerchantsPage'
+import MerchantsDocumentsList from './MerchantsDocumentsList'
 import PageNotFound from './PageNotFound'
 import { Route, Switch } from 'react-router-dom'
 
@@ -25,6 +26,9 @@ function App() {
       </Route>
       <Route exact path='/deal-list/:name'>
         {user.boss ? <MerchantsPage /> : <PageNotFound />}
+      </Route>
+      <Route exact path='/deal-list/:name/documents'>
+        {user.boss ? <MerchantsDocumentsList /> : <PageNotFound />}
       </Route>
       <Route path="*">
         <PageNotFound />

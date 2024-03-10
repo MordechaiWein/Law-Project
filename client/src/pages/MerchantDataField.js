@@ -1,5 +1,5 @@
 import React from 'react'
-import styles from '../styles/MerchantStyles'
+import styles from '../styles/MerchantDataStyles'
 import Grid from '@mui/material/Grid'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'

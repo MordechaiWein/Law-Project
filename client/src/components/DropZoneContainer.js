@@ -65,7 +65,6 @@ function DropZoneContainer() {
                     response.json().then(data => {
                         setResError(data.error)
                         setIsLoading(false)
-                        console.log(data.errors)
                     })
                 }
             })

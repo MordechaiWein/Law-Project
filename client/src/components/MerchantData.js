@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useContext } from "react"
 import MerchantDataField from "../pages/MerchantDataField"
-import styles from "../styles/MerchantStyles"
+import styles from "../styles/MerchantDataStyles"
 import Container from '@mui/material/Container'
 import Box from '@mui/material/Box'
 import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
+import ArrowBackSharpIcon from '@mui/icons-material/ArrowBackSharp'
 import { AppContext } from "./AppContext"
 import Big from 'big.js'
 
@@ -617,8 +617,8 @@ function MerchantData({ merchant, setDataPageFlag }) {
 
         <Container maxWidth={false} sx={styles.dataContainer}>
             <Box sx={styles.dataBox}>
+                <ArrowBackSharpIcon fontSize="large" sx={styles.dataArrow} onClick={() => setDataPageFlag(false)} />
                 <Typography sx={styles.dataTitle}>Merchant Data Summary</Typography>
-                <ArrowForwardIcon fontSize="large" sx={styles.dataArrow} onClick={() => setDataPageFlag(false)} />
             </Box>
 
             <Grid container spacing={2}>{gridItems}</Grid>

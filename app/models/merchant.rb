@@ -1,5 +1,6 @@
 class Merchant < ApplicationRecord
     belongs_to :user
+    has_many_attached :documents
     
     # Methods: 
     def Merchant.parse_contract_pdf(file_path)

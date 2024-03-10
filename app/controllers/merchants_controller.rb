@@ -34,7 +34,9 @@ class MerchantsController < ApplicationController
 
    
         if parse_contract == "Wrong Doc" || parse_payment_history == "Wrong Doc" || parse_funding_confirmation == "Wrong Doc"
-            render json: {error: 'Document parsing failed. The App currently supports limited file formats. Contact admin for assistance.'}, status: :unprocessable_entity
+            render json: {
+                error: 'Document parsing failed. The App currently supports limited file formats. Contact admin for assistance.'
+            }, status: :unprocessable_entity
         else
             # Merge all pulled values into a single hash to be stored in the database.
             compiled_hash = {}
@@ -43,7 +45,22 @@ class MerchantsController < ApplicationController
             # Find the user. Create a new row in the database. Render a json response with a "created" status code.
             user = User.find(session[:user_id])
             merchant = user.merchants.create!(integrated_hash)
-            render json: {merchant: merchant, message: 'Documents parsed successfully. See deal list to view your added information.'}, status: :created
+
+            contract.original_filename= "Contract - #{integrated_hash[:merchants_legal_name_title_case]}.pdf"
+            funding_confirmation.original_filename  = "Funding Confirmation - #{integrated_hash[:merchants_legal_name_title_case]}.png"
+            payment_history.original_filename = "Payment History - #{integrated_hash[:merchants_legal_name_title_case]}.pdf"
+          
+            merchant.documents.attach(params[:contract])
+            merchant.documents.attach(params[:funding_confirmation])
+            merchant.documents.attach(params[:payment_history])
+      
+            document_info = merchant.documents.map { |document| { url: document.service_url, filename: document.filename } }
+      
+            render json: {
+                merchant: merchant.as_json.merge(document_info: document_info),
+                message: 'Documents parsed successfully. See deal list to view your added information.'
+            }, 
+            status: :created
         end
     end
 
@@ -51,6 +68,11 @@ class MerchantsController < ApplicationController
         merchant = Merchant.find(params[:id])
         merchant.destroy
         render json: merchant
+    end
+
+    def download_merchant_document
+        s3_response = HTTParty.get(params[:url])
+        send_data s3_response.body
     end
 
     private

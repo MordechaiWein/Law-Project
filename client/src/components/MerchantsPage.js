@@ -69,7 +69,7 @@ function MerchantsPage() {
 
     const merchantGridLeft  = leftGrid.map(row  => <MerchantsPageTab key={row.id} row={row} />)
     const merchantGridRight = rightGrid.map(row => <MerchantsPageTab key={row.id} row={row} />)
-  
+
     return (
     
         <ThemeProvider theme={theme}>
@@ -94,7 +94,7 @@ function MerchantsPage() {
 
                         <Divider />
 
-                        <MerchantOperations isSmScr={isSmScr} merchant={merchant} />
+                        <MerchantOperations isSmScr={isSmScr} merchant={merchant} paramsName={params.name}/>
                     </>
                 }
             </Container>

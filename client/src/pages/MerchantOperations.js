@@ -5,8 +5,9 @@ import Container from '@mui/material/Container'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
+import { Link } from 'react-router-dom'
 
-function MerchantOperations({ isSmScr, merchant }) {
+function MerchantOperations({ isSmScr, merchant, paramsName }) {
 
     const props = { variant: 'contained', disableRipple: true }
     const [actionsFlag, setActionsFlag] = useState(false)
@@ -59,7 +60,9 @@ function MerchantOperations({ isSmScr, merchant }) {
                     <Button {...props} sx={styles.repBtn}>Manually Record Payment</Button>
                     <Button {...props} sx={styles.repBtn}>Generate Payrun</Button>
                     <Button {...props} sx={styles.repBtn}>Generate Remittance Report</Button>
-                    <Button {...props} sx={styles.repBtn}>Document List</Button>
+                    <Link to={`/deal-list/${paramsName}/documents`}>
+                        <Button {...props} sx={styles.repBtn}>Document List</Button>
+                    </Link>
                     <Button {...props} sx={styles.repBtn}>Notes</Button>
                 </Box>
 

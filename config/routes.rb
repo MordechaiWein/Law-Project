@@ -6,7 +6,10 @@ Rails.application.routes.draw do
   post '/one-time-signup-link', to: 'users#signup_link'
   post '/signup-link-confirmation', to: 'users#signup_link_confirmation'
 
+  post '/download-merchant-document', to: 'merchants#download_merchant_document'
+
   resources :merchants, only: [:index, :create, :update, :destroy]
+  
   # Routing logic: fallback requests for React Router.
   # Leave this here to help deploy your app later!
   get "*path", to: "fallback#index", constraints: ->(req) { !req.xhr? && req.format.html? }
