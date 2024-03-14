@@ -81,6 +81,9 @@ GEM
       aws-sdk-core (~> 3, >= 3.191.0)
       aws-sdk-kms (~> 1)
       aws-sigv4 (~> 1.8)
+    aws-sdk-textract (1.56.0)
+      aws-sdk-core (~> 3, >= 3.191.0)
+      aws-sigv4 (~> 1.1)
     aws-sigv4 (1.8.0)
       aws-eventstream (~> 1, >= 1.0.2)
     bcrypt (3.1.16)
@@ -219,6 +222,7 @@ PLATFORMS
 DEPENDENCIES
   active_model_serializers (~> 0.10.12)
   aws-sdk-s3
+  aws-sdk-textract
   bcrypt (~> 3.1.7)
   bootsnap (>= 1.4.4)
   byebug

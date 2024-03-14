@@ -32,7 +32,7 @@ class MerchantsController < ApplicationController
         parse_payment_history = Merchant.parse_payment_history_pdf(payment_history.tempfile.path)
         parse_funding_confirmation = Merchant.parse_funding_confirmation_png(funding_confirmation.tempfile.path)
 
-   
+       
         if parse_contract == "Wrong Doc" || parse_payment_history == "Wrong Doc" || parse_funding_confirmation == "Wrong Doc"
             render json: {
                 error: 'Document parsing failed. The App currently supports limited file formats. Contact admin for assistance.'
@@ -53,7 +53,22 @@ class MerchantsController < ApplicationController
             merchant.documents.attach(params[:contract])
             merchant.documents.attach(params[:funding_confirmation])
             merchant.documents.attach(params[:payment_history])
-      
+
+            contract_attachment = merchant.documents.find { |attachment| attachment.filename == params[:contract].original_filename }
+            funding_attachment = merchant.documents.find { |attachment| attachment.filename == params[:funding_confirmation].original_filename }
+
+            contract_service_url = contract_attachment.service_url
+            funding_service_url = funding_attachment.service_url
+
+            redact_contract = Merchant.redact_document(contract_service_url)
+            redact_funding = Merchant.redact_document(funding_service_url)
+
+            contract_tempfile = URI.open(redact_contract)
+            funding_tempfile = URI.open(redact_funding)
+
+            merchant.documents.attach(io: contract_tempfile, filename: "Contract - #{integrated_hash[:merchants_legal_name_title_case]} (redacted).pdf ")
+            merchant.documents.attach(io: funding_tempfile, filename: "Funding Confirmation - #{integrated_hash[:merchants_legal_name_title_case]} (redacted).png")
+
             document_info = merchant.documents.map { |document| { url: document.service_url, filename: document.filename } }
       
             render json: {

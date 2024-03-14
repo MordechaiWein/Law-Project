@@ -329,47 +329,83 @@ class Merchant < ApplicationRecord
         end
     end
     
+
     def Merchant.parse_funding_confirmation_png(file_path)
+        # Variables.
         hash = {}
-
+        date_regex = /\A\d{2}\/\d{2}\/\d{4}\z/
         begin
-            # Create a MiniMagick image object.
-            image = MiniMagick::Image.open(file_path)
+            if File.extname(file_path) == ".png"
+                # AWS Textract.
+                client = Aws::Textract::Client.new(
+                    region: 'us-east-1',
+                    credentials:  Aws::Credentials.new(
+                        Figaro.env.aws_access_key_id,
+                        Figaro.env.aws_secret_access_key
+                    ),   
+                )
 
-            # Convert the image to grayscale otherwise highlighted text will not be captured.
-            image.colorspace('Gray')
-        
-            # Save the grayscale image temporarily.
-            grayscale_file_path = "#{File.dirname(file_path)}/grayscale_#{File.basename(file_path)}"
-            image.write(grayscale_file_path)
-        
-            # Create RTesseract object using the grayscale image.
-            grayscale_image = RTesseract.new(grayscale_file_path)
-        
-            # Perform OCR on the grayscale image.
-            image_string = grayscale_image.to_s
+                file_content = File.binread(file_path)
+                
+                response = client.detect_document_text({
+                    document: {
+                        bytes: file_content
+                    }
+                })
+                # Format the response into a text string...
+                blocks = response[:blocks]
+                filtered_blocks = blocks.filter { |block| block[:block_type] == "LINE" }
+                text = filtered_blocks.map { |block| block[:text] }.join(' ')
 
-            split = image_string.split(" ")
-            date_regex = /\A\d{2}\/\d{2}\/\d{4}\z/
-        
-            # Get an array of the strings that are dates.
-            filter = split.filter { |line| line.match(date_regex) }
+                # Split the string into an array filter all date strings.
+                split = text.split(" ")
+                filter = split.filter { |line| line.match(date_regex) }
 
-            # Find the most recent date.
-            dates = filter.map { |date_str| Date.strptime(date_str, '%m/%d/%Y') }
-            latest_date = dates.max
-        
-            # Format the date.
-            confirmation_date = latest_date.strftime('%B %d, %Y')
-        
-            # Add the result to the hash.
-            hash[:image_date] = confirmation_date
-        
-            # Return the hash.
-            hash
-        rescue RTesseract::Error
+                # Format each date string and get the final one.
+                dates = filter.map { |date_str| Date.strptime(date_str, '%m/%d/%Y') }
+                latest_date = dates.max
+
+                # Format the final date into "xx/xx/xx" format.
+                confirmation_date = latest_date.strftime('%B %d, %Y')
+
+                # Add the result to the hash..
+                hash[:image_date] = confirmation_date
+
+                # Finally return the hash.
+                hash
+            else
+                "Wrong Doc"
+            end
+        rescue StandardError
             "Wrong Doc"
         end
+    end
+
+    def Merchant.redact_document(url)
+        endpoint = 'https://api.pdf.co/v1/pdf/edit/delete-text'
+        api_key = "mordwein77@gmail.com_jxrIPi82nSV5IfPp2S472QH55M6hNUI0pqDsR2ecRAv3dj2lQU3pv28kLU749Jz3"
+        
+        payload = {
+            url: url,
+            name: 'pdfWithTextDeleted',
+            caseSensitive: false,
+            searchStrings: [
+                'THE METAL BOX BROKERAGE, LLC',
+                'GAIL GROSS',
+                'Deanna Whittaker' 
+            ],
+            replacementLimit: 0,
+            async: false,
+            profiles: "{'UsePatch': true, 'PatchColor': '#000000', 'RemoveTextUnderPatch': true}"
+        }
+        payload_json = payload.to_json
+        headers = {
+            'Content-Type' => 'application/json',
+            'x-api-key' => api_key
+        }
+        response = HTTParty.post(endpoint, headers: headers, body: payload_json)
+        parsed_response = JSON.parse(response.body)
+        parsed_response['url']
     end
 
 end
