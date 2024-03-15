@@ -408,4 +408,69 @@ class Merchant < ApplicationRecord
         parsed_response['url']
     end
 
+
+    def Merchant.redact_image(url, file_path)
+        credentials = {
+            region: 'us-east-1',
+            credentials: Aws::Credentials.new(Figaro.env.aws_access_key_id, Figaro.env.aws_secret_access_key)
+        }
+        client = Aws::Textract::Client.new(credentials)
+
+        file_content = File.binread(file_path)
+        
+        response = client.detect_document_text({
+            document: {
+                bytes: file_content
+            }
+        })
+        name_regex = /^[A-Z][a-z]*\s+[A-Z][a-z]*$/
+        num_regex = /\b\d{6,}\b/
+        accountents = ["gail gross", "deanna whittaker", "michal gomes","hector suero"]
+        ignored_words = [
+            "tracking id:",
+            "recipient wire",
+            "created by:",
+            "beneficiary fiid:",
+            "beneficiary fi",
+            "authorized by:",
+            "will process on:",
+            "from account:",
+            "address 1:",
+            "to account:",
+            "beneficiary fi city:",
+            "to account type:",
+            "originator wire",
+            "Beneficiary fi zip:",
+        ]
+        
+        blocks = response[:blocks]
+        block_to_hash = blocks.map { |block| block.to_h }
+        lines = block_to_hash.filter { |block| block[:block_type] == "LINE" }
+        filtered_lines = lines.filter do |b|
+            !ignored_words.include?(b[:text].downcase) && 
+            (
+                b[:text].match(name_regex) ||
+                accountents.include?(b[:text].downcase) ||
+                b[:text].match(num_regex)
+            )
+        end
+        bounding_boxes = filtered_lines.map {|block| block[:geometry][:bounding_box]}
+        
+        image = Magick::ImageList.new(url) do |options|
+            options.density = '300x300'
+        end
+        
+        draw = Magick::Draw.new
+        draw.fill('black')
+        bounding_boxes.map do |box|
+            x1 = box[:left] * image.columns
+            y1 = (box[:top] - 0.02) * image.rows
+            x2 = x1 + (box[:width] * image.columns)
+            y2 = y1 + (box[:height] * image.rows * 1.5)
+            draw.rectangle(x1, y1, x2, y2)
+        end
+        draw.draw(image)
+        image
+    end
+
 end

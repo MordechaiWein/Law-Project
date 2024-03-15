@@ -61,13 +61,16 @@ class MerchantsController < ApplicationController
             funding_service_url = funding_attachment.service_url
 
             redact_contract = Merchant.redact_document(contract_service_url)
-            redact_funding = Merchant.redact_document(funding_service_url)
+            redact_funding = Merchant.redact_image(funding_service_url, funding_confirmation.tempfile.path)
+
+            redacted_image_tempfile = Tempfile.new(['redacted_funding', '.png'])
+            redact_funding.write(redacted_image_tempfile.path)
+            redacted_image_tempfile.rewind
 
             contract_tempfile = URI.open(redact_contract)
-            funding_tempfile = URI.open(redact_funding)
 
             merchant.documents.attach(io: contract_tempfile, filename: "Contract - #{integrated_hash[:merchants_legal_name_title_case]} (redacted).pdf ")
-            merchant.documents.attach(io: funding_tempfile, filename: "Funding Confirmation - #{integrated_hash[:merchants_legal_name_title_case]} (redacted).png")
+            merchant.documents.attach(io: redacted_image_tempfile, filename: "Funding Confirmation - #{integrated_hash[:merchants_legal_name_title_case]} (redacted).png")
 
             document_info = merchant.documents.map { |document| { url: document.service_url, filename: document.filename } }
       

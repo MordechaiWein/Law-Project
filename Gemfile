@@ -59,3 +59,4 @@ gem "mini_magick", "~> 4.12"
 gem "aws-sdk-s3", require: false
 gem 'httparty'
 gem 'aws-sdk-textract'
+gem 'rmagick', '~> 5.3'
