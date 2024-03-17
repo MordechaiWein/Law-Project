@@ -7,6 +7,9 @@ import { saveAs } from 'file-saver'
 
 function MerchantsDocumentsItem({ docObj }) {
 
+    const filenameArray = docObj.filename.split(/[.-]+/)
+    const subFilenameArray = filenameArray[1].split(" ")
+    const redacted = subFilenameArray.find(word => word === "(redacted)")
 
     function handleDownloadClick() {
         fetch('/download-merchant-document', {
@@ -21,7 +24,11 @@ function MerchantsDocumentsItem({ docObj }) {
     return (
 
         <Box sx={styles.box}>
-            <Typography sx={styles.fileName}>{docObj.filename.split(".")[0]}</Typography>
+            <Box sx={styles.innerBox}>
+                <Typography sx={styles.fileName}>{filenameArray[0]}</Typography>
+                &nbsp;
+                <Typography sx={styles.redacted}>{redacted}</Typography>
+            </Box>
             <DownloadIcon sx={styles.fileIcon} onClick={handleDownloadClick}/>
         </Box>
     )

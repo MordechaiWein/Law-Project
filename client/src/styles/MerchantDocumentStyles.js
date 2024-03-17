@@ -44,18 +44,27 @@ const styles = {
         borderRight: 'solid 1px',
         borderBottom: 'solid 1px',
         borderColor: '#ccc',
-        color: '#0073bb',
         px: 3,
         py: 1
     },
 
+    innerBox: {
+        display: 'flex'
+    },
+
     fileName: {
+        fontFamily: 'AmazonEmberRegular',
+        fontWeight: 'bold'
+    },
+
+    redacted: {
         fontFamily: 'AmazonEmberRegular'
     },
 
     fileIcon: {
         fontSize: 30,
-        '&:hover': { color: '#FFA500', cursor: 'pointer'}
+        color: '#0073bb',
+        '&:hover': { color: '#004d99', cursor: 'pointer'}
     }
 }
 export default styles

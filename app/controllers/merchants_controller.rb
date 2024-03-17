@@ -57,11 +57,11 @@ class MerchantsController < ApplicationController
             contract_attachment = merchant.documents.find { |attachment| attachment.filename == params[:contract].original_filename }
             funding_attachment = merchant.documents.find { |attachment| attachment.filename == params[:funding_confirmation].original_filename }
 
-            contract_service_url = contract_attachment.service_url
-            funding_service_url = funding_attachment.service_url
+            contract_url = contract_attachment.url
+            funding_url = funding_attachment.url
 
-            redact_contract = Merchant.redact_document(contract_service_url)
-            redact_funding = Merchant.redact_image(funding_service_url, funding_confirmation.tempfile.path)
+            redact_contract = Merchant.redact_document(contract_url, contract.tempfile.path)
+            redact_funding = Merchant.redact_image(funding_url, funding_confirmation.tempfile.path)
 
             redacted_image_tempfile = Tempfile.new(['redacted_funding', '.png'])
             redact_funding.write(redacted_image_tempfile.path)
@@ -72,7 +72,7 @@ class MerchantsController < ApplicationController
             merchant.documents.attach(io: contract_tempfile, filename: "Contract - #{integrated_hash[:merchants_legal_name_title_case]} (redacted).pdf ")
             merchant.documents.attach(io: redacted_image_tempfile, filename: "Funding Confirmation - #{integrated_hash[:merchants_legal_name_title_case]} (redacted).png")
 
-            document_info = merchant.documents.map { |document| { url: document.service_url, filename: document.filename } }
+            document_info = merchant.documents.map { |document| { url: document.url, filename: document.filename } }
       
             render json: {
                 merchant: merchant.as_json.merge(document_info: document_info),

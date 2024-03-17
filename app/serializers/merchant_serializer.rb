@@ -69,7 +69,7 @@ class MerchantSerializer < ActiveModel::Serializer
   ) 
 
   def document_info
-    object.documents.map { |document| { url: document.service_url, filename: document.filename } }
+    object.documents.map { |document| { url: document.url, filename: document.filename } }
   end
   
 end

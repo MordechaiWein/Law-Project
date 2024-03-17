@@ -2,6 +2,7 @@ class Merchant < ApplicationRecord
     belongs_to :user
     has_many_attached :documents
     
+    
     # Methods: 
     def Merchant.parse_contract_pdf(file_path)
 
@@ -381,31 +382,61 @@ class Merchant < ApplicationRecord
         end
     end
 
-    def Merchant.redact_document(url)
-        endpoint = 'https://api.pdf.co/v1/pdf/edit/delete-text'
+    def Merchant.redact_document(url, file_path)
+        
+        reader = PDF::Reader.new(file_path)
+
+        first_page = reader.pages.first.text
+        all_pages = ''
+
+        content = reader.pages.each { |page| all_pages << page.text }
+
+        search_strings = []
+
+        phone_regex = /(?:\+\d{1,2}\s?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/
+        email_regex = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/
+        security_nums_regex = /(?:\b\d{3}-\d{2}-\d{4}\b)|(?:(?:\d{9})|(?:\d{3}-\d{2}-\d{4})|(?:\d{2}-\d{7}))|(?:\b\d{8}\b)|(?:\b\d{3}\s\d{3}\s\d{3}\b)/
+        dda_regex = /\b\d{7,12}\b/
+        
+        phone_nums = first_page.scan(phone_regex)
+        emails = first_page.scan(email_regex)
+        security_nums = all_pages.scan(security_nums_regex)
+        ddas = all_pages.scan(dda_regex)
+
+        search_strings = (phone_nums + emails + security_nums + ddas).flatten.uniq
+
         api_key = "mordwein77@gmail.com_jxrIPi82nSV5IfPp2S472QH55M6hNUI0pqDsR2ecRAv3dj2lQU3pv28kLU749Jz3"
+        headers = { 'Content-Type' => 'application/json', 'x-api-key' => api_key }
+        split_endpoint = 'https://api.pdf.co/v1/pdf/split/'
+        delete_endpoint = 'https://api.pdf.co/v1/pdf/edit/delete-text'
         
         payload = {
             url: url,
+            pages: "1-8, 9-",
+            name: 'PDF-split-by-string',
+            async: false
+        }
+        
+        payload_json = payload.to_json
+        response = HTTParty.post(split_endpoint, headers: headers, body: payload_json)
+        parsed_response = JSON.parse(response.body)
+        new_url = parsed_response['urls'][0]
+        
+        second_payload = {
+            url: new_url,
             name: 'pdfWithTextDeleted',
             caseSensitive: false,
-            searchStrings: [
-                'THE METAL BOX BROKERAGE, LLC',
-                'GAIL GROSS',
-                'Deanna Whittaker' 
-            ],
+            searchStrings: search_strings,
             replacementLimit: 0,
             async: false,
             profiles: "{'UsePatch': true, 'PatchColor': '#000000', 'RemoveTextUnderPatch': true}"
         }
-        payload_json = payload.to_json
-        headers = {
-            'Content-Type' => 'application/json',
-            'x-api-key' => api_key
-        }
-        response = HTTParty.post(endpoint, headers: headers, body: payload_json)
-        parsed_response = JSON.parse(response.body)
-        parsed_response['url']
+
+        second_payload_json = second_payload.to_json
+        second_response = HTTParty.post(delete_endpoint, headers: headers, body: second_payload_json)
+     
+        second_parsed_response = JSON.parse(second_response.body)
+        second_parsed_response['url']
     end
 
 
