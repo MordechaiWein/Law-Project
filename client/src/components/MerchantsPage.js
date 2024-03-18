@@ -69,7 +69,7 @@ function MerchantsPage() {
 
     const merchantGridLeft  = leftGrid.map(row  => <MerchantsPageTab key={row.id} row={row} />)
     const merchantGridRight = rightGrid.map(row => <MerchantsPageTab key={row.id} row={row} />)
-    console.log(merchant)
+
     return (
     
         <ThemeProvider theme={theme}>

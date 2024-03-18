@@ -68,16 +68,20 @@ const styles = {
         fontFamily: 'AmazonEmberRegular'
     },
 
+    buttonBox: {
+        display: 'flex', 
+        justifyContent: 'center'
+    },
+
     button: {
         fontSize: '1rem',
         fontWeight: 'bold',
         fontFamily: 'AmazonEmberRegular',
         textTransform: 'none', 
         borderRadius: '0px',
-        width: '500px',
-        alignSelf: 'center', 
-        p: 1, 
-        mt: 1
+        width: '300px',
+        p: 1,
+        m: 1
     },
 
     error: {

@@ -66,7 +66,26 @@ function DocxTemplateGenerator({ merchant, setActionsFlag }) {
     })
 
     // Component functions...
-    function handleGenerateClick() {
+    function convertDocxToPdf(generatedDocx) {
+        const formData = new FormData()
+        const docxFile = new File(
+            [generatedDocx],
+            'generated.docx', 
+            {type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' 
+        })
+        formData.append('File', docxFile)
+        fetch("https://v2.convertapi.com/convert/docx/to/pdf?Secret=SvK6GnLScAtXBJ1W&StoreFile=true", {
+            method: "POST",
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            const pdfUrl = data.Files[0].Url
+            saveAs(pdfUrl, `Summons & Complaint-${merchant.merchants_legal_name_title_case}.pdf`)
+        })
+    }
+
+    function handleGenerateClick(docType) {
 
         const additionalData = {
             currentDate: todaysDate,
@@ -108,7 +127,12 @@ function DocxTemplateGenerator({ merchant, setActionsFlag }) {
                         type: 'blob',
                         mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
                     });
-                    saveAs(out, `Summons & Complaint-${merchant.merchants_legal_name_title_case}.docx`);
+                    if (docType === "word") {
+                        saveAs(out, `Summons & Complaint-${merchant.merchants_legal_name_title_case}.docx`);
+                    }
+                    else if (docType === "pdf") {
+                        convertDocxToPdf(out);
+                    }
                 }
             )
         }
@@ -329,8 +353,14 @@ function DocxTemplateGenerator({ merchant, setActionsFlag }) {
                         :
                         null
                     }
-                    <Button variant="contained" disableRipple sx={styles.button} onClick={handleGenerateClick}>Generate Lawsuit</Button>
-
+                    <Box sx={styles.buttonBox}>
+                        <Button variant="contained" disableRipple sx={styles.button} onClick={() => handleGenerateClick("word")}>
+                            Generate Word Doc
+                        </Button>
+                        <Button variant="contained" disableRipple sx={styles.button} onClick={() => handleGenerateClick("pdf")}>
+                            Generate Lawsuit
+                        </Button>
+                    </Box>
                     <Typography sx={styles.error}>{generationError}</Typography>
 
                 </Container>
