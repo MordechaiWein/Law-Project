@@ -1,1 +1,3 @@
 # Will add info here in deployment...
+puts 'Test seed...🌱🌱🌱'
+puts 'Seeding complete!'
