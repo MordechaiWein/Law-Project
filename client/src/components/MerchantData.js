@@ -297,7 +297,7 @@ function MerchantData({ merchant, setDataPageFlag }) {
             id: 4,  
             key: 'Guarantor # 1 - Email',  
             name: 'email_address',  
-            value: data.email_address, 
+            value: data.email_address
         },
         {
             id: 5,
@@ -527,7 +527,6 @@ function MerchantData({ merchant, setDataPageFlag }) {
             name: 'totalPayback',
             value: computedData.totalPayback
         },
-
         {
             id: 43, 
             key: 'Contract Payoff Date',

@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useContext} from "react"
 import styles from '../styles/DocxTemplateGeneratorStyles'
 import oneMerchantOneGuarantor from '../templates/1 Merchant 1 Guarantor.docx'
 import oneMerchantTwoGuarantors from '../templates/1 Merchant 2 Guarantors.docx'
@@ -15,6 +15,8 @@ import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
 import Divider from '@mui/material/Divider'
 import { createTheme, ThemeProvider } from '@mui/material/styles'
+import { PDFDocument } from "pdf-lib"
+import { AppContext } from "../components/AppContext"
 
 const defaultTheme = createTheme({ palette: { primary: { main: '#5d9bd5' }, secondary: { main: '#FF9900' } } })
 
@@ -24,7 +26,10 @@ function loadFile(url, callback) {
 
 function DocxTemplateGenerator({ merchant, setActionsFlag }) {
 
+    const { editMerchant } = useContext(AppContext)
+
     let docToBeGenerated = null
+    let exhibitPage = null
 
     if (merchant.second_guarantor) {
         docToBeGenerated = oneMerchantTwoGuarantors
@@ -65,7 +70,111 @@ function DocxTemplateGenerator({ merchant, setActionsFlag }) {
         secondGuarShortName: ''
     })
 
+    const merchantsDocsSorted = merchant.document_info.sort((a, b) => {
+        return a.filename.localeCompare(b.filename)
+    })
+
     // Component functions...
+    function addMasterDocToMerchantsDocuments(completedDoc) {
+
+        const formData = new FormData()
+        formData.append('id', merchant.id); 
+        formData.append('merchants_legal_name', merchant.merchants_legal_name_title_case); 
+        formData.append('master_doc', completedDoc)
+    
+        fetch('/add-master-doc-to-merches-docs', {
+            method: "POST",
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => editMerchant(data))
+    }
+
+    async function getExhibitPage(url) {
+        await fetch('/find-exhibit-base-page', {
+            method: 'POST',
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({url: url})
+        })
+        .then(response => response.json())
+        .then(data => exhibitPage = data.page_number)
+    }
+
+    async function addMerchantAttachments(generatedUrl) {
+        await getExhibitPage(generatedUrl)
+
+        const contractUrl =  merchantsDocsSorted[0].url
+        const fundingConfUrl = merchantsDocsSorted[2].url
+        const paymentHistUrl = merchantsDocsSorted[4].url
+
+        const summonsComp = await fetch(generatedUrl).then((res) => res.arrayBuffer());
+
+        const contract = await fetch(contractUrl).then((res) => res.arrayBuffer());
+        const fundingConf = await fetch(fundingConfUrl).then((res) => res.arrayBuffer());
+        const paymentHist = await fetch(paymentHistUrl).then((res) => res.arrayBuffer());
+
+        const masterDocument = await PDFDocument.load(summonsComp);
+        const readContract = await PDFDocument.load(contract);
+        const readPaymentHist = await PDFDocument.load(paymentHist);
+
+        const contractPages = readContract.getPages();
+        const paymentHistPages = readPaymentHist.getPages();
+
+        const contractLength = readContract.getPageCount();
+        const paymentHistLength = readPaymentHist.getPageCount();
+
+        const [existingPage] = masterDocument.getPages();
+        const { width, height } = existingPage.getSize();
+
+        let basePage = exhibitPage;
+
+        for(let i = 0; i < contractLength; i++) {
+            const embeddedPage = await masterDocument.embedPage(contractPages[i]);
+            const contractPage = masterDocument.insertPage(basePage += 1, [width, height]);
+            contractPage.drawPage(embeddedPage, {
+                x: 0,
+                y: 0,
+                width: width,
+                height: height
+            });
+        };
+
+        basePage = exhibitPage;
+
+        const embeddedPng = await masterDocument.embedPng(fundingConf);
+        const pngDims = embeddedPng.scale(0.75);
+
+        const imageInsertionIndex  = basePage + contractLength + 2;
+        const imagePage = masterDocument.insertPage(imageInsertionIndex, [width, pngDims.height]);
+
+        imagePage.drawImage(embeddedPng, {
+            x: 0,
+            y: 0,
+            width: width,
+            height: pngDims.height
+        });
+
+        let paymentInsertionIndex = imageInsertionIndex + 1;
+
+        for(let i = 0; i < paymentHistLength; i++) {
+            const embeddedPage = await masterDocument.embedPage(paymentHistPages[i]);
+            const paymentPage = masterDocument.insertPage(paymentInsertionIndex += 1, [width, height]);
+            paymentPage.drawPage(embeddedPage, {
+                x: 0,
+                y: 0,
+                width: width,
+                height: height
+            });
+        };
+
+        paymentInsertionIndex = imageInsertionIndex + 1;
+
+        const pdfBytes = await masterDocument.save();
+        const pdfBlob = new Blob([pdfBytes], { type: 'application/pdf' });
+        saveAs(pdfBlob, `Summons & Complaint-${merchant.merchants_legal_name_title_case}.pdf`);
+        addMasterDocToMerchantsDocuments(pdfBlob)
+    }
+
     function convertDocxToPdf(generatedDocx) {
         const formData = new FormData()
         const docxFile = new File(
@@ -81,7 +190,7 @@ function DocxTemplateGenerator({ merchant, setActionsFlag }) {
         .then(response => response.json())
         .then(data => {
             const pdfUrl = data.Files[0].Url
-            saveAs(pdfUrl, `Summons & Complaint-${merchant.merchants_legal_name_title_case}.pdf`)
+            addMerchantAttachments(pdfUrl)
         })
     }
 

@@ -504,4 +504,31 @@ class Merchant < ApplicationRecord
         image
     end
 
+    def Merchant.find_exhibit_page_number(url)
+        response = HTTParty.get(url)
+
+        tempfile = Tempfile.new(['pdf', '.pdf'], encoding: 'ascii-8bit')
+        tempfile.binmode
+        tempfile.write(response.body)
+        tempfile.close
+
+        reader = PDF::Reader.new(tempfile.path)
+        
+        page_number = ''
+        all_pages = ''
+
+        reader.pages.each_with_index do |page, index|
+            page_text = page.text
+            all_pages << page_text
+            if page_text.include?("EXHIBIT “A”")
+                page_number = index 
+                break
+            else
+                page_number = nil
+            end
+        end
+        
+        page_number ? page_number : "The text 'EXHIBIT A' was not found in the PDF."
+    end
+
 end

@@ -18,12 +18,12 @@ function MerchantDataField({ row, handleChange, handleComputedChange, handleBlur
                 <Typography sx={styles.datakey}>{row.key}</Typography>
                 <TextField
                     size="small"
-                    autoComplete='off'
+                    autoComplete='new-password'
                     InputProps={{style: styles.dataValue}}
                     placeholder={row.key === 'Payment Frequency' ? "Available options: Weekly, Daily" : ''}
                     onChange={computedKeys.includes(row.key) ? handleComputedChange : handleChange}
                     onBlur={() => handleBlur(row.id)} 
-                    value={row.value}
+                    value={row.value ? row.value : ''}
                     name={row.name}
                 />
             </Stack>

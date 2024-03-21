@@ -46,7 +46,7 @@ class MerchantsController < ApplicationController
             user = User.find(session[:user_id])
             merchant = user.merchants.create!(integrated_hash)
 
-            contract.original_filename= "Contract - #{integrated_hash[:merchants_legal_name_title_case]}.pdf"
+            contract.original_filename = "Contract - #{integrated_hash[:merchants_legal_name_title_case]}.pdf"
             funding_confirmation.original_filename  = "Funding Confirmation - #{integrated_hash[:merchants_legal_name_title_case]}.png"
             payment_history.original_filename = "Payment History - #{integrated_hash[:merchants_legal_name_title_case]}.pdf"
           
@@ -91,6 +91,19 @@ class MerchantsController < ApplicationController
     def download_merchant_document
         s3_response = HTTParty.get(params[:url])
         send_data s3_response.body
+    end
+
+    def find_exhibit_basepage
+        number = Merchant.find_exhibit_page_number(params[:url])
+        render json: {page_number: number}
+    end
+
+    def add_master_doc_to_merches_docs
+        merchant = Merchant.find(params[:id])
+        master_doc = params[:master_doc]
+        master_doc.original_filename = "Summons & Complaint - #{params[:merchants_legal_name]}.pdf"
+        merchant.documents.attach(params[:master_doc])
+        render json: merchant
     end
 
     private

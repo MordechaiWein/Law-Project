@@ -7,6 +7,8 @@ Rails.application.routes.draw do
   post '/signup-link-confirmation', to: 'users#signup_link_confirmation'
 
   post '/download-merchant-document', to: 'merchants#download_merchant_document'
+  post '/find-exhibit-base-page', to: 'merchants#find_exhibit_basepage'
+  post '/add-master-doc-to-merches-docs', to: 'merchants#add_master_doc_to_merches_docs'
 
   resources :merchants, only: [:index, :create, :update, :destroy]
   
