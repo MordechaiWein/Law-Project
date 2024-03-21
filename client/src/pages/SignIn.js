@@ -59,6 +59,7 @@ function SignIn() {
                             InputProps={{style: styles.textField}}
                             autoComplete="off"
                             onChange={handleChange}
+                            size="small"
                             name="name"
                             value={data.name}
                         />
@@ -70,6 +71,7 @@ function SignIn() {
                             type="password" 
                             InputProps={{style: styles.textField}}
                             onChange={handleChange}
+                            size="small"
                             name="password"
                             value={data.password}
                         />

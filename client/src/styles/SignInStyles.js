@@ -39,7 +39,6 @@ const styles = {
     },
     
     textField: {
-        height: '38px', 
         fontSize: '0.85rem',
         fontFamily: "AmazonEmberRegular"
     },
