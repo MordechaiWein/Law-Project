@@ -15,7 +15,11 @@ Rails.application.routes.draw do
   # Routing logic: fallback requests for React Router.
   # Leave this here to help deploy your app later!
 
-  # Testing this!!
+  # IMPORTANT: the bellow commented out path was what was written by Flatiron school
+  # This was leading to issues in production specifically if the path after '.com' included a period
+  # Example: .com/fhfhfhdh.djdjdj To fix this I am using second new line. It hasn't been thoroughly tested
+
   # get "*path", to: "fallback#index", constraints: ->(req) { !req.xhr? && req.format.html? }
+
   get "*path", to: "fallback#index", constraints: ->(req) { !req.xhr? }
 end
