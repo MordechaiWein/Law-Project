@@ -73,7 +73,7 @@ function MerchantsPage() {
     return (
     
         <ThemeProvider theme={theme}>
-            <Container style={{ maxWidth: isLgScr ? "2400px" : "100%" }} sx={isLgScr ? styles.contLg : styles.contSm}>
+            <Container style={{ maxWidth: isLgScr ? "2700px" : "100%" }} sx={isLgScr ? styles.contLg : styles.contSm}>
                 {dataPageFlag ? 
                     <MerchantData merchant={merchant} setDataPageFlag={setDataPageFlag}/>
                     :

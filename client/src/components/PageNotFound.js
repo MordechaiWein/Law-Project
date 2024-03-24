@@ -13,7 +13,7 @@ function PageNotFound() {
 
     return (
 
-        <Container style={{ maxWidth: isLgScr ? "2400px" : "100%" }} sx={isLgScr ? styles.contLg : styles.contSm}>
+        <Container style={{ maxWidth: isLgScr ? "2700px" : "100%" }} sx={isLgScr ? styles.contLg : styles.contSm}>
     
             <Box>
                 <Typography sx={styles.Oops}>Oops!</Typography>

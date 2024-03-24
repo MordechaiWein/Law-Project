@@ -18,7 +18,7 @@ function SubmissionsContainer() {
 
     return (
     
-        <Container disableGutters style={{ maxWidth: isLgScr ? "2400px" : "100%" }} sx={isLgScr ? styles.contLg : styles.contSm}>
+        <Container disableGutters style={{ maxWidth: isLgScr ? "2700px" : "100%" }} sx={isLgScr ? styles.contLg : styles.contSm}>
             
             <SubmissionsNavigation isMobile={isMobile} hideNavbar={hideNavbar} />
 

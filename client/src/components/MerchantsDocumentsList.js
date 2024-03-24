@@ -32,7 +32,7 @@ function MerchantsDocumentsList() {
 
     return (
 
-        <Container style={{ maxWidth: isLgScr ? "2400px" : "100%" }} sx={isLgScr ? styles.contLg : styles.contSm}>
+        <Container style={{ maxWidth: isLgScr ? "2700px" : "100%" }} sx={isLgScr ? styles.contLg : styles.contSm}>
 
             <Box sx={styles.titleBox}>
                 <ArrowBackSharpIcon fontSize="large" sx={styles.arrowIcon} onClick={() => history.goBack()}/>

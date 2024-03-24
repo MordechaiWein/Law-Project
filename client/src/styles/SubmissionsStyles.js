@@ -107,7 +107,7 @@ const styles = {
     },
 
     instructions: {
-        fontSize: {xs: '2rem', sm: '2rem', md: '2rem', lg: '3rem'},
+        fontSize: '2rem',
         fontWeight: 'bold',
         fontFamily: "AmazonEmberRegular",
         marginBottom: '2rem'
