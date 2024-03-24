@@ -38,7 +38,7 @@ class UsersController < ApplicationController
 
     # Checks if the one-time sign up link is valid...
     def signup_link_confirmation
-        token = params[:pathname]
+        token = params[:id]
         secret_key = Figaro.env.JWT_SECRET_KEY
         decoded_token = JWT.decode(token, secret_key, true, algorithm: 'HS256')
         head :no_content
