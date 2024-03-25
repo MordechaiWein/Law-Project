@@ -3,7 +3,7 @@ const styles = {
     // ============= DropZoneCard.js ============= //
                 
     gridBoxInact: {
-        height: {xs: '200px', sm: '200px', lg: '250px'},
+        height: {xs: '200px', sm: '200px', lg: '200px'},
         display: 'flex', 
         flexDirection: 'column', 
         border: 'dashed 2.5px #ccc', 
@@ -16,7 +16,7 @@ const styles = {
     },
 
     gridBoxAct: {
-        height: {xs: '200px', sm: '200px', lg: '250px'},
+        height: {xs: '200px', sm: '200px', lg: '200px'},
         display: 'flex', 
         flexDirection: 'column', 
         border: 'dashed 2.5px #0099cc', 

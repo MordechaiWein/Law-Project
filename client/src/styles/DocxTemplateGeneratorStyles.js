@@ -7,11 +7,30 @@ const styles = {
         height: '550px'
     },
 
+    loadingBox: {
+        display: 'flex', 
+        flexDirection: 'column', 
+        justifyContent: 'center',
+        alignItems: 'center', 
+        width: '994px', 
+        height: '100%'
+    },
+
+    spinner: {
+        p: 6
+    },
+
+    loadingText: {
+        fontFamily: 'AmazonEmberRegular', 
+        fontSize: '1.5rem', 
+        fontWeight: 'bold'
+    },
+
     container: {
         height: '100%',
         display: 'flex', 
         flexDirection: 'column', 
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
     },
     
     title: {

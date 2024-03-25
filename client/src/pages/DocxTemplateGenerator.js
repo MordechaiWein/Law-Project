@@ -14,6 +14,7 @@ import Typography from '@mui/material/Typography'
 import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
 import Divider from '@mui/material/Divider'
+import CircularProgress from '@mui/material/CircularProgress'
 import { createTheme, ThemeProvider } from '@mui/material/styles'
 import { PDFDocument } from "pdf-lib"
 import { AppContext } from "../components/AppContext"
@@ -55,6 +56,7 @@ function DocxTemplateGenerator({ merchant, setActionsFlag }) {
    
     // Component States...
     const [open, setOpen] = useState(true)
+    const [isLoading, setIsLoading] = useState(false)
     const [generationError, setGenerationError] = useState("")
  
     const [buttonData, setButtonData] = useState({
@@ -171,6 +173,7 @@ function DocxTemplateGenerator({ merchant, setActionsFlag }) {
 
         const pdfBytes = await masterDocument.save();
         const pdfBlob = new Blob([pdfBytes], { type: 'application/pdf' });
+        setIsLoading(false)
         saveAs(pdfBlob, `Summons & Complaint-${merchant.merchants_legal_name_title_case}.pdf`);
         addMasterDocToMerchantsDocuments(pdfBlob)
     }
@@ -183,6 +186,7 @@ function DocxTemplateGenerator({ merchant, setActionsFlag }) {
             {type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' 
         })
         formData.append('File', docxFile)
+        setIsLoading(true)
         fetch("https://v2.convertapi.com/convert/docx/to/pdf?Secret=SvK6GnLScAtXBJ1W&StoreFile=true", {
             method: "POST",
             body: formData
@@ -263,216 +267,225 @@ function DocxTemplateGenerator({ merchant, setActionsFlag }) {
 
         <Dialog open={open} onClose={handleClose} PaperProps={{sx: styles.paperProps}}>
             <ThemeProvider theme={defaultTheme}>
-                <Container disableGutters sx={styles.container}>
-                    
-                    <Typography sx={styles.title}>GENERATE LAWSUIT</Typography>
-
-                    <Box sx={styles.box}>
-                        <Typography sx={styles.boxTitle}>Court</Typography>
-                        <Button
-                            variant={buttonData.court === "KINGS" ? "contained" : "outlined"}
-                            sx={buttonData.court === "KINGS" ? styles.selected : styles.select}
-                            onClick={handleSelectClick}
-                            disableRipple
-                            name="court"
-                            value="KINGS"
-                        >
-                            Kings
-                        </Button>
-                        <Button
-                            variant={buttonData.court === "NASSAU" ? "contained" : "outlined"}
-                            sx={buttonData.court === "NASSAU" ? styles.selected : styles.select}
-                            onClick={handleSelectClick}
-                            disableRipple
-                            name="court"
-                            value="NASSAU"
-                        >
-                            Nassau
-                        </Button>
+                {isLoading ? 
+                    <Box sx={styles.loadingBox}>
+                        <CircularProgress sx={styles.spinner}/>
+                        <Typography sx={styles.loadingText}>
+                            Generating the fully compiled summons and complaint document. Please wait...
+                        </Typography>
                     </Box>
+                    :
+                    <Container disableGutters sx={styles.container}>
+                        
+                        <Typography sx={styles.title}>GENERATE LAWSUIT</Typography>
 
-                    <Divider/>
-
-                    <Box sx={styles.box}>
-                        <Typography sx={styles.boxTitle}>{merchant.merchants_legal_name_title_case}</Typography>
-                        <Button
-                            variant={buttonData.entityShortName === entityArray[0] ? "contained" : "outlined"}
-                            sx={buttonData.entityShortName === entityArray[0] ? styles.selected : styles.select}
-                            onClick={handleSelectClick}
-                            disableRipple
-                            name="entityShortName"
-                            value={entityArray[0]}
-                        >
-                            {entityArray[0]}
-                        </Button>
-                        {entityArray[1] ?
+                        <Box sx={styles.box}>
+                            <Typography sx={styles.boxTitle}>Court</Typography>
                             <Button
-                                variant={buttonData.entityShortName === entityArray[1] ? "contained" : "outlined"}
-                                sx={buttonData.entityShortName === entityArray[1] ? styles.selected : styles.select}
+                                variant={buttonData.court === "KINGS" ? "contained" : "outlined"}
+                                sx={buttonData.court === "KINGS" ? styles.selected : styles.select}
+                                onClick={handleSelectClick}
+                                disableRipple
+                                name="court"
+                                value="KINGS"
+                            >
+                                Kings
+                            </Button>
+                            <Button
+                                variant={buttonData.court === "NASSAU" ? "contained" : "outlined"}
+                                sx={buttonData.court === "NASSAU" ? styles.selected : styles.select}
+                                onClick={handleSelectClick}
+                                disableRipple
+                                name="court"
+                                value="NASSAU"
+                            >
+                                Nassau
+                            </Button>
+                        </Box>
+
+                        <Divider/>
+
+                        <Box sx={styles.box}>
+                            <Typography sx={styles.boxTitle}>{merchant.merchants_legal_name_title_case}</Typography>
+                            <Button
+                                variant={buttonData.entityShortName === entityArray[0] ? "contained" : "outlined"}
+                                sx={buttonData.entityShortName === entityArray[0] ? styles.selected : styles.select}
                                 onClick={handleSelectClick}
                                 disableRipple
                                 name="entityShortName"
-                                value={entityArray[1]}
+                                value={entityArray[0]}
                             >
-                                {entityArray[1]}
+                                {entityArray[0]}
                             </Button>
-                            :
-                            <Typography sx={styles.empty}></Typography>
-                        }
-                        {entityArray[2] ?
-                            <Button
-                                variant={buttonData.entityShortName === entityArray[2] ? "contained" : "outlined"}
-                                sx={buttonData.entityShortName === entityArray[2] ? styles.selected : styles.select}
-                                onClick={handleSelectClick}
-                                disableRipple
-                                name="entityShortName"
-                                value={entityArray[2]}
-                            >
-                                {entityArray[2]}
-                            </Button>
-                            :
-                            <Typography sx={styles.empty}></Typography>
-                        }
-                        <TextField 
-                            InputProps={{style: styles.textfield}}
-                            color="secondary"
-                            autoComplete="off"
-                            onChange={handleChange}
-                            placeholder="Enter custom..."
-                            name="entityShortName" 
-                            value={fieldData.entityShortName}   
-                        />
-                    </Box>
-
-                    <Divider/>
-                    
-                    {firstGArray.length > 0 && merchant.first_guarantor !== merchant.merchants_legal_name ?
-                        <>
-                            <Box sx={styles.box}>
-                                <Typography sx={styles.boxTitle}>{merchant.first_guarantor_title_case}</Typography>
+                            {entityArray[1] ?
                                 <Button
-                                    variant={buttonData.firstGuarShortName === firstGArray[0] ? "contained" : "outlined"}
-                                    sx={buttonData.firstGuarShortName === firstGArray[0] ? styles.selected : styles.select}
+                                    variant={buttonData.entityShortName === entityArray[1] ? "contained" : "outlined"}
+                                    sx={buttonData.entityShortName === entityArray[1] ? styles.selected : styles.select}
                                     onClick={handleSelectClick}
                                     disableRipple
-                                    name="firstGuarShortName"
-                                    value={firstGArray[0]}
+                                    name="entityShortName"
+                                    value={entityArray[1]}
                                 >
-                                    {firstGArray[0]}
+                                    {entityArray[1]}
                                 </Button>
-                                {firstGArray[1] ?
+                                :
+                                <Typography sx={styles.empty}></Typography>
+                            }
+                            {entityArray[2] ?
+                                <Button
+                                    variant={buttonData.entityShortName === entityArray[2] ? "contained" : "outlined"}
+                                    sx={buttonData.entityShortName === entityArray[2] ? styles.selected : styles.select}
+                                    onClick={handleSelectClick}
+                                    disableRipple
+                                    name="entityShortName"
+                                    value={entityArray[2]}
+                                >
+                                    {entityArray[2]}
+                                </Button>
+                                :
+                                <Typography sx={styles.empty}></Typography>
+                            }
+                            <TextField 
+                                InputProps={{style: styles.textfield}}
+                                color="secondary"
+                                autoComplete="off"
+                                onChange={handleChange}
+                                placeholder="Enter custom..."
+                                name="entityShortName" 
+                                value={fieldData.entityShortName}   
+                            />
+                        </Box>
+
+                        <Divider/>
+                        
+                        {firstGArray.length > 0 && merchant.first_guarantor !== merchant.merchants_legal_name ?
+                            <>
+                                <Box sx={styles.box}>
+                                    <Typography sx={styles.boxTitle}>{merchant.first_guarantor_title_case}</Typography>
                                     <Button
-                                        variant={buttonData.firstGuarShortName === firstGArray[1] ? "contained" : "outlined"}
-                                        sx={buttonData.firstGuarShortName === firstGArray[1] ? styles.selected : styles.select}   
+                                        variant={buttonData.firstGuarShortName === firstGArray[0] ? "contained" : "outlined"}
+                                        sx={buttonData.firstGuarShortName === firstGArray[0] ? styles.selected : styles.select}
                                         onClick={handleSelectClick}
                                         disableRipple
                                         name="firstGuarShortName"
-                                        value={firstGArray[1]}
+                                        value={firstGArray[0]}
                                     >
-                                        {firstGArray[1]}
+                                        {firstGArray[0]}
                                     </Button>
-                                    :
-                                    <Typography sx={styles.empty}></Typography>
-                                }
-                                {firstGArray[2] ?
-                                    <Button
-                                        variant={buttonData.firstGuarShortName === firstGArray[2] ? "contained" : "outlined"}
-                                        sx={buttonData.firstGuarShortName === firstGArray[2] ? styles.selected : styles.select}
-                                        onClick={handleSelectClick}
-                                        disableRipple
+                                    {firstGArray[1] ?
+                                        <Button
+                                            variant={buttonData.firstGuarShortName === firstGArray[1] ? "contained" : "outlined"}
+                                            sx={buttonData.firstGuarShortName === firstGArray[1] ? styles.selected : styles.select}   
+                                            onClick={handleSelectClick}
+                                            disableRipple
+                                            name="firstGuarShortName"
+                                            value={firstGArray[1]}
+                                        >
+                                            {firstGArray[1]}
+                                        </Button>
+                                        :
+                                        <Typography sx={styles.empty}></Typography>
+                                    }
+                                    {firstGArray[2] ?
+                                        <Button
+                                            variant={buttonData.firstGuarShortName === firstGArray[2] ? "contained" : "outlined"}
+                                            sx={buttonData.firstGuarShortName === firstGArray[2] ? styles.selected : styles.select}
+                                            onClick={handleSelectClick}
+                                            disableRipple
+                                            name="firstGuarShortName"
+                                            value={firstGArray[2]}
+                                        >
+                                            {firstGArray[2]}
+                                        </Button>
+                                        :
+                                        <Typography sx={styles.empty}></Typography>
+                                    }
+                                    <TextField 
+                                        InputProps={{style: styles.textfield}}
+                                        color="secondary"
+                                        autoComplete="off"
+                                        onChange={handleChange}
+                                        placeholder="Enter custom..."
                                         name="firstGuarShortName"
-                                        value={firstGArray[2]}
-                                    >
-                                        {firstGArray[2]}
-                                    </Button>
-                                    :
-                                    <Typography sx={styles.empty}></Typography>
-                                }
-                                <TextField 
-                                    InputProps={{style: styles.textfield}}
-                                    color="secondary"
-                                    autoComplete="off"
-                                    onChange={handleChange}
-                                    placeholder="Enter custom..."
-                                    name="firstGuarShortName"
-                                    value={fieldData.firstGuarShortName}   
-                                />
-                            </Box>
+                                        value={fieldData.firstGuarShortName}   
+                                    />
+                                </Box>
 
-                            <Divider/>
-                        </>
-                        :
-                        null
-                    }
-                    {secondGArray.length > 0 ?
-                        <>
-                            <Box sx={styles.box}>
-                                <Typography sx={styles.boxTitle}>{merchant.second_guarantor_title_case}</Typography>
-                                <Button
-                                    variant={buttonData.secondGuarShortName === secondGArray[0] ? "contained" : "outlined"}
-                                    sx={buttonData.secondGuarShortName === secondGArray[0] ? styles.selected : styles.select}
-                                    onClick={handleSelectClick}
-                                    disableRipple
-                                    name="secondGuarShortName"
-                                    value={secondGArray[0]}
-                                >
-                                    {secondGArray[0]}
-                                </Button>
-                                {secondGArray[1] ? 
+                                <Divider/>
+                            </>
+                            :
+                            null
+                        }
+                        {secondGArray.length > 0 ?
+                            <>
+                                <Box sx={styles.box}>
+                                    <Typography sx={styles.boxTitle}>{merchant.second_guarantor_title_case}</Typography>
                                     <Button
-                                        variant={buttonData.secondGuarShortName === secondGArray[1] ? "contained" : "outlined"}
-                                        sx={buttonData.secondGuarShortName === secondGArray[1] ? styles.selected : styles.select}
+                                        variant={buttonData.secondGuarShortName === secondGArray[0] ? "contained" : "outlined"}
+                                        sx={buttonData.secondGuarShortName === secondGArray[0] ? styles.selected : styles.select}
                                         onClick={handleSelectClick}
                                         disableRipple
                                         name="secondGuarShortName"
-                                        value={secondGArray[1]}
+                                        value={secondGArray[0]}
                                     >
-                                        {secondGArray[1]}
+                                        {secondGArray[0]}
                                     </Button>
-                                    :
-                                    <Typography sx={styles.empty}></Typography>
-                                }
-                                {secondGArray[2] ?
-                                    <Button
-                                        variant={buttonData.secondGuarShortName === secondGArray[2] ? "contained" : "outlined"}
-                                        sx={buttonData.secondGuarShortName === secondGArray[2] ? styles.selected : styles.select}
-                                        onClick={handleSelectClick}
-                                        disableRipple
+                                    {secondGArray[1] ? 
+                                        <Button
+                                            variant={buttonData.secondGuarShortName === secondGArray[1] ? "contained" : "outlined"}
+                                            sx={buttonData.secondGuarShortName === secondGArray[1] ? styles.selected : styles.select}
+                                            onClick={handleSelectClick}
+                                            disableRipple
+                                            name="secondGuarShortName"
+                                            value={secondGArray[1]}
+                                        >
+                                            {secondGArray[1]}
+                                        </Button>
+                                        :
+                                        <Typography sx={styles.empty}></Typography>
+                                    }
+                                    {secondGArray[2] ?
+                                        <Button
+                                            variant={buttonData.secondGuarShortName === secondGArray[2] ? "contained" : "outlined"}
+                                            sx={buttonData.secondGuarShortName === secondGArray[2] ? styles.selected : styles.select}
+                                            onClick={handleSelectClick}
+                                            disableRipple
+                                            name="secondGuarShortName"
+                                            value={secondGArray[2]}
+                                        >
+                                            {secondGArray[2]}
+                                        </Button>
+                                        :
+                                        <Typography sx={styles.empty}></Typography>
+                                    }
+                                    <TextField 
+                                        InputProps={{style: styles.textfield}}
+                                        color="secondary"
+                                        autoComplete="off"
+                                        onChange={handleChange}
+                                        placeholder="Enter custom..."
                                         name="secondGuarShortName"
-                                        value={secondGArray[2]}
-                                    >
-                                        {secondGArray[2]}
-                                    </Button>
-                                    :
-                                    <Typography sx={styles.empty}></Typography>
-                                }
-                                <TextField 
-                                    InputProps={{style: styles.textfield}}
-                                    color="secondary"
-                                    autoComplete="off"
-                                    onChange={handleChange}
-                                    placeholder="Enter custom..."
-                                    name="secondGuarShortName"
-                                    value={fieldData.secondGuarShortName}   
-                                />
-                            </Box>
+                                        value={fieldData.secondGuarShortName}   
+                                    />
+                                </Box>
 
-                            <Divider/>
-                        </>
-                        :
-                        null
-                    }
-                    <Box sx={styles.buttonBox}>
-                        <Button variant="contained" disableRipple sx={styles.button} onClick={() => handleGenerateClick("word")}>
-                            Generate Word Doc
-                        </Button>
-                        <Button variant="contained" disableRipple sx={styles.button} onClick={() => handleGenerateClick("pdf")}>
-                            Generate Lawsuit
-                        </Button>
-                    </Box>
-                    <Typography sx={styles.error}>{generationError}</Typography>
+                                <Divider/>
+                            </>
+                            :
+                            null
+                        }
+                        <Box sx={styles.buttonBox}>
+                            <Button variant="contained" disableRipple sx={styles.button} onClick={() => handleGenerateClick("word")}>
+                                Generate Word Doc
+                            </Button>
+                            <Button variant="contained" disableRipple sx={styles.button} onClick={() => handleGenerateClick("pdf")}>
+                                Generate Lawsuit
+                            </Button>
+                        </Box>
+                        <Typography sx={styles.error}>{generationError}</Typography>
 
-                </Container>
+                    </Container>
+                }
             </ThemeProvider>
         </Dialog>
     )

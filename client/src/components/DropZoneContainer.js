@@ -1,5 +1,6 @@
 import React, { useState, useContext } from 'react'
 import DropZoneCard from '../pages/DropZoneCard'
+import OperationLoading from './OperationLoading'
 import styles from '../styles/DropZoneStyles'
 import Box from '@mui/material/Box'
 import Grid from '@mui/material/Grid'
@@ -12,6 +13,10 @@ function DropZoneContainer() {
     const {merchants, setMerchants} = useContext(AppContext)
 
     // Component States...
+    const [open, setOpen] = useState(true);
+    
+    const handleClose = () => {setOpen(false)};
+
     const [hoveredId, setHoveredId] = useState(null)
     const [isLoading, setIsLoading] = useState(false)
     const [submitError, setSubmitError] = useState('')
@@ -59,12 +64,14 @@ function DropZoneContainer() {
                     response.json().then(data => {
                         setResSuccess(data.message)
                         setIsLoading(false)
+                        handleClose()
                         setMerchants([...merchants, data.merchant])
                     })
                 } else { 
                     response.json().then(data => {
                         setResError(data.error)
                         setIsLoading(false)
+                        handleClose()
                     })
                 }
             })
@@ -106,6 +113,8 @@ function DropZoneContainer() {
         
         <Box component="form" onSubmit={handleSubmit}>
 
+            {isLoading ? <OperationLoading open={open}/> : null }
+            
             <Grid container spacing={4}>{gridItems}</Grid>
         
             {resSuccess ? 
@@ -118,7 +127,7 @@ function DropZoneContainer() {
 
             {submitError ? <Alert severity="error" sx={styles.submitError} onClose={() => setSubmitError("")}>{submitError}</Alert> : null}
             
-            <Button type='submit' variant="contained" disableRipple sx={styles.button}>{isLoading ? 'Loading...' : 'Submit' }</Button>
+            <Button type='submit' variant="contained" disableRipple sx={styles.button}>Submit</Button>
 
         </Box>
     )
